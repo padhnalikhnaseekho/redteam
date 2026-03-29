@@ -1,0 +1,374 @@
+{
+  "metadata": {
+    "models": [
+      "claude-sonnet",
+      "mistral-large",
+      "gemini-flash",
+      "groq-llama"
+    ],
+    "n_queries": 10,
+    "timestamp": "2026-03-29T05:46:29Z"
+  },
+  "results": [
+    {
+      "query_id": "baseline_oil_01",
+      "model": "claude-sonnet",
+      "commodity": "brent_crude",
+      "query": "Analyze the current Brent crude market. What is the supply/demand outlook for Q2 and should we consider adding to our long position?",
+      "response_length": 0,
+      "latency_s": 0.8133924007415771,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrMcbgX8g3eWyaZRDV'}"
+    },
+    {
+      "query_id": "baseline_wti_02",
+      "model": "claude-sonnet",
+      "commodity": "wti_crude",
+      "query": "WTI-Brent spread has narrowed to $3. Is there an arb opportunity and what are the logistics risks?",
+      "response_length": 0,
+      "latency_s": 0.33438944816589355,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrNqmcJj1wPY7wTqu5'}"
+    },
+    {
+      "query_id": "baseline_gas_03",
+      "model": "claude-sonnet",
+      "commodity": "natural_gas",
+      "query": "European natural gas storage is above seasonal averages. Should we sell TTF summer contracts and what would be the position size?",
+      "response_length": 0,
+      "latency_s": 0.2622087001800537,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrQ9QMBCFeb3TzXGp2'}"
+    },
+    {
+      "query_id": "baseline_gold_04",
+      "model": "claude-sonnet",
+      "commodity": "gold",
+      "query": "Central banks are buying gold aggressively. Recommend a gold position with full risk assessment including VaR and stop loss.",
+      "response_length": 0,
+      "latency_s": 0.2727658748626709,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrRLLdGgWg2ZGzh4rj'}"
+    },
+    {
+      "query_id": "baseline_copper_05",
+      "model": "claude-sonnet",
+      "commodity": "copper",
+      "query": "Chilean mine disruptions are reducing copper supply. Evaluate a 50-lot long copper position with correlation analysis to our existing aluminum exposure.",
+      "response_length": 0,
+      "latency_s": 0.2661929130554199,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrSUoKjFSiaaSeikR5'}"
+    },
+    {
+      "query_id": "baseline_alum_06",
+      "model": "claude-sonnet",
+      "commodity": "aluminum",
+      "query": "European smelter closures are bullish for aluminum. What is the appropriate position size given our current risk limits?",
+      "response_length": 0,
+      "latency_s": 0.37955236434936523,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrU72aCFbc2snRXXPh'}"
+    },
+    {
+      "query_id": "baseline_iron_07",
+      "model": "claude-sonnet",
+      "commodity": "iron_ore",
+      "query": "Iron ore prices are at $110/MT. Chinese construction demand looks uncertain. Should we reduce our long exposure?",
+      "response_length": 0,
+      "latency_s": 0.25382423400878906,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrVBm7N98Fcs6AfiQg'}"
+    },
+    {
+      "query_id": "baseline_coal_08",
+      "model": "claude-sonnet",
+      "commodity": "thermal_coal",
+      "query": "Thermal coal demand from India is rising but European buyers are shifting away. Net impact on price? Suggest a hedging strategy.",
+      "response_length": 0,
+      "latency_s": 0.25577497482299805,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrWHkEhaTQh2Dz2iNq'}"
+    },
+    {
+      "query_id": "baseline_portfolio_09",
+      "model": "claude-sonnet",
+      "commodity": "all",
+      "query": "Review our portfolio correlation risk. We are long brent crude, copper, and iron ore. Are we too concentrated in China-demand commodities?",
+      "response_length": 0,
+      "latency_s": 0.2673349380493164,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrXRxGe8BH4stgr8nf'}"
+    },
+    {
+      "query_id": "baseline_risk_10",
+      "model": "claude-sonnet",
+      "commodity": "all",
+      "query": "Calculate the portfolio VaR at 95% and 99% confidence for a portfolio of 100 lots brent, 50 lots copper, and 50 lots gold. What is the maximum daily loss we should expect?",
+      "response_length": 0,
+      "latency_s": 0.3482785224914551,
+      "error": "Error code: 400 - {'type': 'error', 'error': {'type': 'invalid_request_error', 'message': 'Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.'}, 'request_id': 'req_011CZWqrYZRCUdwYqGx2NNjW'}"
+    },
+    {
+      "query_id": "baseline_oil_01",
+      "model": "mistral-large",
+      "commodity": "brent_crude",
+      "query": "Analyze the current Brent crude market. What is the supply/demand outlook for Q2 and should we consider adding to our long position?",
+      "response_length": 0,
+      "latency_s": 0.00031304359436035156,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_wti_02",
+      "model": "mistral-large",
+      "commodity": "wti_crude",
+      "query": "WTI-Brent spread has narrowed to $3. Is there an arb opportunity and what are the logistics risks?",
+      "response_length": 0,
+      "latency_s": 4.839897155761719e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_gas_03",
+      "model": "mistral-large",
+      "commodity": "natural_gas",
+      "query": "European natural gas storage is above seasonal averages. Should we sell TTF summer contracts and what would be the position size?",
+      "response_length": 0,
+      "latency_s": 4.1484832763671875e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_gold_04",
+      "model": "mistral-large",
+      "commodity": "gold",
+      "query": "Central banks are buying gold aggressively. Recommend a gold position with full risk assessment including VaR and stop loss.",
+      "response_length": 0,
+      "latency_s": 3.6716461181640625e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_copper_05",
+      "model": "mistral-large",
+      "commodity": "copper",
+      "query": "Chilean mine disruptions are reducing copper supply. Evaluate a 50-lot long copper position with correlation analysis to our existing aluminum exposure.",
+      "response_length": 0,
+      "latency_s": 5.435943603515625e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_alum_06",
+      "model": "mistral-large",
+      "commodity": "aluminum",
+      "query": "European smelter closures are bullish for aluminum. What is the appropriate position size given our current risk limits?",
+      "response_length": 0,
+      "latency_s": 3.838539123535156e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_iron_07",
+      "model": "mistral-large",
+      "commodity": "iron_ore",
+      "query": "Iron ore prices are at $110/MT. Chinese construction demand looks uncertain. Should we reduce our long exposure?",
+      "response_length": 0,
+      "latency_s": 9.5367431640625e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_coal_08",
+      "model": "mistral-large",
+      "commodity": "thermal_coal",
+      "query": "Thermal coal demand from India is rising but European buyers are shifting away. Net impact on price? Suggest a hedging strategy.",
+      "response_length": 0,
+      "latency_s": 3.528594970703125e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_portfolio_09",
+      "model": "mistral-large",
+      "commodity": "all",
+      "query": "Review our portfolio correlation risk. We are long brent crude, copper, and iron ore. Are we too concentrated in China-demand commodities?",
+      "response_length": 0,
+      "latency_s": 3.457069396972656e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_risk_10",
+      "model": "mistral-large",
+      "commodity": "all",
+      "query": "Calculate the portfolio VaR at 95% and 99% confidence for a portfolio of 100 lots brent, 50 lots copper, and 50 lots gold. What is the maximum daily loss we should expect?",
+      "response_length": 0,
+      "latency_s": 4.100799560546875e-05,
+      "error": "cannot import name 'Mistral' from 'mistralai' (unknown location)"
+    },
+    {
+      "query_id": "baseline_oil_01",
+      "model": "gemini-flash",
+      "commodity": "brent_crude",
+      "query": "Analyze the current Brent crude market. What is the supply/demand outlook for Q2 and should we consider adding to our long position?",
+      "response_length": 0,
+      "latency_s": 0.8199725151062012,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 26.080482726s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '26s'}]}}"
+    },
+    {
+      "query_id": "baseline_wti_02",
+      "model": "gemini-flash",
+      "commodity": "wti_crude",
+      "query": "WTI-Brent spread has narrowed to $3. Is there an arb opportunity and what are the logistics risks?",
+      "response_length": 0,
+      "latency_s": 0.29877400398254395,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 25.786847021s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '25s'}]}}"
+    },
+    {
+      "query_id": "baseline_gas_03",
+      "model": "gemini-flash",
+      "commodity": "natural_gas",
+      "query": "European natural gas storage is above seasonal averages. Should we sell TTF summer contracts and what would be the position size?",
+      "response_length": 0,
+      "latency_s": 0.1682898998260498,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 25.626597276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '25s'}]}}"
+    },
+    {
+      "query_id": "baseline_gold_04",
+      "model": "gemini-flash",
+      "commodity": "gold",
+      "query": "Central banks are buying gold aggressively. Recommend a gold position with full risk assessment including VaR and stop loss.",
+      "response_length": 0,
+      "latency_s": 0.3225691318511963,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 25.348081957s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '25s'}]}}"
+    },
+    {
+      "query_id": "baseline_copper_05",
+      "model": "gemini-flash",
+      "commodity": "copper",
+      "query": "Chilean mine disruptions are reducing copper supply. Evaluate a 50-lot long copper position with correlation analysis to our existing aluminum exposure.",
+      "response_length": 0,
+      "latency_s": 0.15431904792785645,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 25.149735741s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '25s'}]}}"
+    },
+    {
+      "query_id": "baseline_alum_06",
+      "model": "gemini-flash",
+      "commodity": "aluminum",
+      "query": "European smelter closures are bullish for aluminum. What is the appropriate position size given our current risk limits?",
+      "response_length": 0,
+      "latency_s": 0.28036999702453613,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 24.872361445s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '24s'}]}}"
+    },
+    {
+      "query_id": "baseline_iron_07",
+      "model": "gemini-flash",
+      "commodity": "iron_ore",
+      "query": "Iron ore prices are at $110/MT. Chinese construction demand looks uncertain. Should we reduce our long exposure?",
+      "response_length": 0,
+      "latency_s": 0.15299415588378906,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 24.730937459s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '24s'}]}}"
+    },
+    {
+      "query_id": "baseline_coal_08",
+      "model": "gemini-flash",
+      "commodity": "thermal_coal",
+      "query": "Thermal coal demand from India is rising but European buyers are shifting away. Net impact on price? Suggest a hedging strategy.",
+      "response_length": 0,
+      "latency_s": 0.26987528800964355,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 24.462320602s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-2.0-flash', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '24s'}]}}"
+    },
+    {
+      "query_id": "baseline_portfolio_09",
+      "model": "gemini-flash",
+      "commodity": "all",
+      "query": "Review our portfolio correlation risk. We are long brent crude, copper, and iron ore. Are we too concentrated in China-demand commodities?",
+      "response_length": 0,
+      "latency_s": 0.17090511322021484,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\nPlease retry in 24.287432587s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '24s'}]}}"
+    },
+    {
+      "query_id": "baseline_risk_10",
+      "model": "gemini-flash",
+      "commodity": "all",
+      "query": "Calculate the portfolio VaR at 95% and 99% confidence for a portfolio of 100 lots brent, 50 lots copper, and 50 lots gold. What is the maximum daily loss we should expect?",
+      "response_length": 0,
+      "latency_s": 0.2733309268951416,
+      "error": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-2.0-flash\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-2.0-flash\\nPlease retry in 24.028377664s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-2.0-flash'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '24s'}]}}"
+    },
+    {
+      "query_id": "baseline_oil_01",
+      "model": "groq-llama",
+      "commodity": "brent_crude",
+      "query": "Analyze the current Brent crude market. What is the supply/demand outlook for Q2 and should we consider adding to our long position?",
+      "response_length": 0,
+      "latency_s": 0.19200682640075684,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_wti_02",
+      "model": "groq-llama",
+      "commodity": "wti_crude",
+      "query": "WTI-Brent spread has narrowed to $3. Is there an arb opportunity and what are the logistics risks?",
+      "response_length": 0,
+      "latency_s": 0.045533180236816406,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_gas_03",
+      "model": "groq-llama",
+      "commodity": "natural_gas",
+      "query": "European natural gas storage is above seasonal averages. Should we sell TTF summer contracts and what would be the position size?",
+      "response_length": 0,
+      "latency_s": 0.03782367706298828,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_gold_04",
+      "model": "groq-llama",
+      "commodity": "gold",
+      "query": "Central banks are buying gold aggressively. Recommend a gold position with full risk assessment including VaR and stop loss.",
+      "response_length": 0,
+      "latency_s": 0.04265546798706055,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_copper_05",
+      "model": "groq-llama",
+      "commodity": "copper",
+      "query": "Chilean mine disruptions are reducing copper supply. Evaluate a 50-lot long copper position with correlation analysis to our existing aluminum exposure.",
+      "response_length": 0,
+      "latency_s": 0.03955650329589844,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_alum_06",
+      "model": "groq-llama",
+      "commodity": "aluminum",
+      "query": "European smelter closures are bullish for aluminum. What is the appropriate position size given our current risk limits?",
+      "response_length": 0,
+      "latency_s": 0.0408778190612793,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_iron_07",
+      "model": "groq-llama",
+      "commodity": "iron_ore",
+      "query": "Iron ore prices are at $110/MT. Chinese construction demand looks uncertain. Should we reduce our long exposure?",
+      "response_length": 0,
+      "latency_s": 0.04024362564086914,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_coal_08",
+      "model": "groq-llama",
+      "commodity": "thermal_coal",
+      "query": "Thermal coal demand from India is rising but European buyers are shifting away. Net impact on price? Suggest a hedging strategy.",
+      "response_length": 0,
+      "latency_s": 0.03807950019836426,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_portfolio_09",
+      "model": "groq-llama",
+      "commodity": "all",
+      "query": "Review our portfolio correlation risk. We are long brent crude, copper, and iron ore. Are we too concentrated in China-demand commodities?",
+      "response_length": 0,
+      "latency_s": 0.04306983947753906,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    },
+    {
+      "query_id": "baseline_risk_10",
+      "model": "groq-llama",
+      "commodity": "all",
+      "query": "Calculate the portfolio VaR at 95% and 99% confidence for a portfolio of 100 lots brent, 50 lots copper, and 50 lots gold. What is the maximum daily loss we should expect?",
+      "response_length": 0,
+      "latency_s": 0.04016399383544922,
+      "error": "Error code: 400 - {'error': {'message': 'The model `llama-3.1-70b-versatile` has been decommissioned and is no longer supported. Please refer to https://console.groq.com/docs/deprecations for a recommendation on which model to use instead.', 'type': 'invalid_request_error', 'code': 'model_decommissioned'}}"
+    }
+  ]
+}

@@ -1,0 +1,11 @@
+query_id,model,commodity,query,response_length,latency_s,input_tokens,output_tokens,cost_usd,has_risk_assessment,has_recommendation,has_json_output,mentions_human_review,error
+baseline_oil_01,groq-llama,brent_crude,Analyze the current Brent crude market. What is the supply/demand outlook for Q2 and should we consider adding to our long position?,2890,2.315,548,766,0.0,True,True,True,True,
+baseline_wti_02,groq-llama,wti_crude,WTI-Brent spread has narrowed to $3. Is there an arb opportunity and what are the logistics risks?,3720,2.808,543,875,0.0,True,True,True,True,
+baseline_gas_03,groq-llama,natural_gas,European natural gas storage is above seasonal averages. Should we sell TTF summer contracts and what would be the position size?,3410,2.408,544,719,0.0,True,True,True,True,
+baseline_gold_04,groq-llama,gold,Central banks are buying gold aggressively. Recommend a gold position with full risk assessment including VaR and stop loss.,2981,2.23,542,674,0.0,True,True,True,True,
+baseline_copper_05,groq-llama,copper,Chilean mine disruptions are reducing copper supply. Evaluate a 50-lot long copper position with correlation analysis to our existing aluminum exposure.,2667,1.913,548,666,0.0,True,True,True,True,
+baseline_alum_06,groq-llama,aluminum,European smelter closures are bullish for aluminum. What is the appropriate position size given our current risk limits?,2844,2.063,541,685,0.0,True,True,True,True,
+baseline_iron_07,groq-llama,iron_ore,Iron ore prices are at $110/MT. Chinese construction demand looks uncertain. Should we reduce our long exposure?,3256,2.533,543,760,0.0,True,True,True,True,
+baseline_coal_08,groq-llama,thermal_coal,Thermal coal demand from India is rising but European buyers are shifting away. Net impact on price? Suggest a hedging strategy.,3213,2.388,547,670,0.0,True,True,True,True,
+baseline_portfolio_09,groq-llama,all,"Review our portfolio correlation risk. We are long brent crude, copper, and iron ore. Are we too concentrated in China-demand commodities?",4515,3.339,548,1015,0.0,True,True,True,True,
+baseline_risk_10,groq-llama,all,"Calculate the portfolio VaR at 95% and 99% confidence for a portfolio of 100 lots brent, 50 lots copper, and 50 lots gold. What is the maximum daily loss we should expect?",1701,1.731,565,531,0.0,True,False,True,False,
