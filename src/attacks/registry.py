@@ -54,6 +54,7 @@ def _auto_discover():
         "v5_reasoning_hijacking",
         "v6_confidence_manipulation",
         "v7_multi_step_compounding",
+        "v7_parallel_test",
     ]
     for name in module_names:
         try:
