@@ -87,8 +87,12 @@ class LLMClient:
         model_name: str,
         messages: list[dict[str, str]],
         tools: list[dict] | None = None,
+        timeout: int = 120,
     ) -> dict[str, Any]:
         """Send a chat completion request and return a normalised response dict.
+
+        Args:
+            timeout: Max seconds to wait for a response (default 120).
 
         Returns:
             {
@@ -106,18 +110,24 @@ class LLMClient:
 
         t0 = time.time()
 
-        if provider == "openai":
-            result = self._chat_openai(client, cfg, messages, tools)
-        elif provider == "anthropic":
-            result = self._chat_anthropic(client, cfg, messages, tools)
-        elif provider == "mistral":
-            result = self._chat_mistral(client, cfg, messages, tools)
-        elif provider == "google":
-            result = self._chat_google(client, cfg, messages, tools)
-        elif provider == "groq":
-            result = self._chat_groq(client, cfg, messages, tools)
-        else:
-            raise ValueError(f"Unknown provider: {provider}")
+        import concurrent.futures
+        def _call():
+            if provider == "openai":
+                return self._chat_openai(client, cfg, messages, tools)
+            elif provider == "anthropic":
+                return self._chat_anthropic(client, cfg, messages, tools)
+            elif provider == "mistral":
+                return self._chat_mistral(client, cfg, messages, tools)
+            elif provider == "google":
+                return self._chat_google(client, cfg, messages, tools)
+            elif provider == "groq":
+                return self._chat_groq(client, cfg, messages, tools)
+            else:
+                raise ValueError(f"Unknown provider: {provider}")
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+            future = executor.submit(_call)
+            result = future.result(timeout=timeout)
 
         latency = time.time() - t0
         cost = self._compute_cost(cfg, result["input_tokens"], result["output_tokens"])

@@ -80,9 +80,16 @@ class OutputValidatorDefense(Defense):
             confidence=confidence,
         )
 
+    @staticmethod
+    def _to_float(val, default=0.0) -> float:
+        try:
+            return float(val)
+        except (TypeError, ValueError):
+            return default
+
     def _check_position_limits(self, rec: dict, flags: list[str]) -> None:
         commodity = rec.get("commodity", "").lower().replace(" ", "_")
-        quantity = rec.get("quantity", 0)
+        quantity = self._to_float(rec.get("quantity", 0))
         limit = self._position_limits.get(commodity)
 
         if limit is not None and abs(quantity) > limit:
@@ -115,7 +122,7 @@ class OutputValidatorDefense(Defense):
 
     def _check_price_sanity(self, rec: dict, flags: list[str]) -> None:
         commodity = rec.get("commodity", "").lower().replace(" ", "_")
-        target_price = rec.get("target_price")
+        target_price = self._to_float(rec.get("target_price"), default=None)
         if target_price is None:
             return
 
@@ -174,8 +181,8 @@ class OutputValidatorDefense(Defense):
 
         # Also try to compute from quantity * price
         if notional == 0:
-            quantity = rec.get("quantity", 0)
-            price = rec.get("target_price", 0) or rec.get("entry_price", 0)
+            quantity = self._to_float(rec.get("quantity", 0))
+            price = self._to_float(rec.get("target_price", 0)) or self._to_float(rec.get("entry_price", 0))
             notional = abs(quantity * price) if quantity and price else 0
 
         threshold = self._risk_limits.get("max_single_trade_notional", 5_000_000)

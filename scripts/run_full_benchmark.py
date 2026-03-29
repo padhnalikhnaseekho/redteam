@@ -259,7 +259,7 @@ def main() -> None:
                     "asr": round(asr, 4) if isinstance(asr, float) else 0.0,
                     "detection_rate": round(dr, 4),
                     "total_impact": impact["total_impact"],
-                    "timestamp": datetime.now(datetime.IST).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
                 }
                 save_run_results(evaluator.results, metadata, json_path)
                 console.print(f"  Saved: {json_path.name}")
