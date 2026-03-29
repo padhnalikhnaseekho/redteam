@@ -1,0 +1,8 @@
+category,n,successful,asr
+v1_direct_injection,112,43,0.3839
+v2_indirect_injection,140,17,0.1214
+v3_tool_manipulation,98,26,0.2653
+v4_context_poisoning,70,22,0.3143
+v5_reasoning_hijacking,112,49,0.4375
+v6_confidence_manipulation,84,39,0.4643
+v7_multi_step_compounding,84,16,0.1905

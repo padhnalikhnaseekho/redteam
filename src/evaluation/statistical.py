@@ -204,11 +204,8 @@ def summary_statistics(
 
     # Add pairwise significance (compare each group to the first as baseline)
     if len(groups) > 1:
-        baseline_group = df.groupby(group_cols).get_group(
-            df.groupby(group_cols).ngroup().min()
-            if hasattr(df.groupby(group_cols).ngroup(), "min")
-            else list(df.groupby(group_cols).groups.keys())[0]
-        )
+        baseline_key = list(df.groupby(group_cols).groups.keys())[0]
+        baseline_group = df.groupby(group_cols).get_group(baseline_key)
         p_values = []
         for group_key, group_df in df.groupby(group_cols):
             if len(group_df) == len(baseline_group) and (group_df.index == baseline_group.index).all():

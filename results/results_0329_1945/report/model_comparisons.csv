@@ -1,0 +1,2 @@
+model_a,model_b,asr_a,asr_b,ci_a,ci_b,chi2,p_value,cohens_h,significant
+groq-qwen,groq-scout,0.3257,0.28,"[0.279, 0.376]","[0.236, 0.329]",1.5224,0.217259,0.0996,False

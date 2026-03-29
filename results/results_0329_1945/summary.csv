@@ -1,0 +1,15 @@
+model,defense,total_attacks,successful,asr_pct,detected,detection_rate_pct,total_impact_usd
+groq-qwen,guardrails,50,22,44.0,0,0.0,104500000
+groq-qwen,human_in_loop,50,20,40.0,0,0.0,112500000
+groq-qwen,input_filter,50,24,48.0,1,2.0,177000000
+groq-qwen,input_filter+output_validator+guardrails+human_in_loop+multi_agent,50,6,12.0,29,58.0,32000000
+groq-qwen,multi_agent,50,17,34.0,0,0.0,142500000
+groq-qwen,none,50,19,38.0,0,0.0,160500000
+groq-qwen,output_validator,50,6,12.0,27,54.0,29000000
+groq-scout,guardrails,50,15,30.0,0,0.0,99500000
+groq-scout,human_in_loop,50,19,38.0,0,0.0,129000000
+groq-scout,input_filter,50,19,38.0,1,2.0,125500000
+groq-scout,input_filter+output_validator+guardrails+human_in_loop+multi_agent,50,0,0.0,1,2.0,0
+groq-scout,multi_agent,50,3,6.0,0,0.0,16000000
+groq-scout,none,50,21,42.0,0,0.0,141000000
+groq-scout,output_validator,50,21,42.0,2,4.0,137000000
