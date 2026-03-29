@@ -70,7 +70,8 @@ redteam/
 │   ├── run_baseline.py                   # Run agent on legitimate queries (baseline)
 │   ├── run_attacks.py                    # Run attack suite against agent
 │   ├── run_defenses.py                   # Compare defense strategies
-│   └── generate_report.py               # Generate plots, tables, statistical report
+│   ├── generate_report.py               # Generate plots, tables, statistical report
+│   └── generate_pptx.py                 # Generate PPTX presentation from results
 │
 ├── results/                              # Output directory (auto-created)
 │   ├── baseline_*.json + .csv            # Baseline query results
@@ -364,7 +365,49 @@ python scripts/generate_report.py --results-dir results/results_0329_1430 --outp
 | `category_asr.csv` | ASR per attack category |
 | `model_comparisons.csv` | Chi-squared tests, confidence intervals, Cohen's h |
 
-### Step 5: Run Tests
+### Step 5: Generate PPTX Report
+
+Generate a PowerPoint presentation from benchmark results using the IIT Bombay capstone template. Produces a 14-slide deck with project context (Why/What/How/When/Deliverables) and results (tables, heatmaps, charts, findings).
+
+```bash
+# Auto-detect latest results directory
+python scripts/generate_pptx.py
+
+# Specific results directory
+python scripts/generate_pptx.py --results-dir results/results_0329_1945
+
+# Custom template and output path
+python scripts/generate_pptx.py --template ~/Downloads/AI_ML_Sample_Format.pptx --output ~/Downloads/Report.pptx
+```
+
+**Arguments**:
+| Argument | Description | Default |
+|----------|-------------|---------|
+| `--results-dir` | Path to results directory | Latest in `results/` |
+| `--template` | Path to PPTX template | `~/winhome/Downloads/AI_ML_Sample_Format.pptx` |
+| `--output` | Output PPTX path | `<results-dir>/report/RedTeam_Results.pptx` |
+
+**Slides generated**:
+| Slide | Content |
+|-------|---------|
+| 1 | Title slide |
+| 2 | Problem Statement and Motivation (The "Why") |
+| 3 | Proposed Solution (The "What") |
+| 4 | Data Sources and Tools (The "How") |
+| 5 | Scope and Implementation Roadmap (The "When") |
+| 6 | Key Deliverables |
+| 7 | Discussion & Feedback |
+| 8 | Benchmark results table (ASR, detection, impact) |
+| 9 | ASR heatmap by attack category |
+| 10 | Defense effectiveness bar chart |
+| 11 | Radar vulnerability profiles |
+| 12 | Detection coverage heatmap |
+| 13 | Defense effectiveness ranking (side-by-side) |
+| 14 | Key findings (auto-derived from data) |
+
+**Requires**: `pip install python-pptx lxml`
+
+### Step 6: Run Tests
 
 ```bash
 python -m pytest tests/ -v
