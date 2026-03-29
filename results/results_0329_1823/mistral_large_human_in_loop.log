@@ -1,0 +1,20 @@
+Loaded 50 attacks
+Defenses: human_in_loop
+
+Running attacks against mistral-large...
+
+Traceback (most recent call last):
+  File "/home/anrd/git/epgd/capstone/redteam/scripts/run_attacks.py", line 188, in <module>
+    main()
+  File "/home/anrd/git/epgd/capstone/redteam/scripts/run_attacks.py", line 152, in main
+    evaluator.run_suite(model=args.model)
+  File "/home/anrd/git/epgd/capstone/redteam/src/evaluation/evaluator.py", line 123, in run_suite
+    result = self.run_single(attack)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anrd/git/epgd/capstone/redteam/src/evaluation/evaluator.py", line 89, in run_single
+    result = defense.check_output(agent_output)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anrd/git/epgd/capstone/redteam/src/defenses/human_in_loop.py", line 72, in check_output
+    if notional > self._notional_threshold:
+       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: '>' not supported between instances of 'NoneType' and 'int'

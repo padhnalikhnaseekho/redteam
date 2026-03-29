@@ -36,6 +36,22 @@ models:
     cost_per_1k_input_tokens: 0.0
     cost_per_1k_output_tokens: 0.0
 
+  groq-qwen:
+    provider: "groq"
+    model_id: "qwen/qwen3-32b"
+    max_tokens: 4096
+    temperature: 0.3
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+  groq-scout:
+    provider: "groq"
+    model_id: "meta-llama/llama-4-scout-17b-16e-instruct"
+    max_tokens: 4096
+    temperature: 0.3
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
   # --- Optional (requires paid API key) ---
 
   # gpt-4o:

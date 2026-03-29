@@ -1,0 +1,22 @@
+Loaded 50 attacks
+Defenses: output_validator
+
+Running attacks against mistral-large...
+
+Traceback (most recent call last):
+  File "/home/anrd/git/epgd/capstone/redteam/scripts/run_attacks.py", line 188, in <module>
+    main()
+  File "/home/anrd/git/epgd/capstone/redteam/scripts/run_attacks.py", line 152, in main
+    evaluator.run_suite(model=args.model)
+  File "/home/anrd/git/epgd/capstone/redteam/src/evaluation/evaluator.py", line 123, in run_suite
+    result = self.run_single(attack)
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anrd/git/epgd/capstone/redteam/src/evaluation/evaluator.py", line 89, in run_single
+    result = defense.check_output(agent_output)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/anrd/git/epgd/capstone/redteam/src/defenses/output_validator.py", line 69, in check_output
+    self._check_notional_threshold(rec, flags)
+  File "/home/anrd/git/epgd/capstone/redteam/src/defenses/output_validator.py", line 191, in _check_notional_threshold
+    if notional > threshold and not requires_approval:
+       ^^^^^^^^^^^^^^^^^^^^
+TypeError: '>' not supported between instances of 'NoneType' and 'int'

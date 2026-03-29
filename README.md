@@ -66,6 +66,7 @@ redteam/
 │
 ├── scripts/                              # Entry-point scripts
 │   ├── run_full_benchmark.py             # End-to-end: all models x all defenses + report
+│   ├── run_groq_benchmark.py             # Groq-only: 3 free models (qwen, scout, llama)
 │   ├── run_baseline.py                   # Run agent on legitimate queries (baseline)
 │   ├── run_attacks.py                    # Run attack suite against agent
 │   ├── run_defenses.py                   # Compare defense strategies
@@ -103,12 +104,18 @@ redteam/
 | Model | Provider | Config Name | Cost | Status |
 |-------|----------|-------------|------|--------|
 | LLaMA 3.3 70B | Groq | `groq-llama` | Free | **Default** |
+| Qwen3 32B | Groq | `groq-qwen` | Free | Available |
+| Llama 4 Scout 17B (MoE) | Groq | `groq-scout` | Free | Available |
 | Gemini 2.0 Flash | Google AI Studio | `gemini-flash` | Free | Available (daily quota) |
 | Mistral Large | Mistral | `mistral-large` | Free tier | Available |
 | Claude Sonnet 4 | Anthropic | `claude-sonnet` | Paid | Optional |
 | GPT-4o | OpenAI | `gpt-4o` | Paid | Optional (commented out) |
 
 **Minimum requirement**: At least one working API key. Groq and Gemini are free.
+
+> **Note on Groq rate limits**: Groq free tier has daily token limits per model.
+> If you hit the limit on `groq-llama`, use `groq-qwen` or `groq-scout` instead —
+> each model has its own independent quota.
 
 ### Baseline Results (Verified)
 
@@ -226,6 +233,22 @@ python scripts/run_full_benchmark.py --models groq-llama
 # Adjust delay between API calls (default 2s)
 python scripts/run_full_benchmark.py --delay 3
 ```
+
+### Groq-Only Benchmark (Free, Fast)
+
+If you want to run **only free Groq models** (zero cost, fast LPU inference):
+
+```bash
+python scripts/run_groq_benchmark.py
+```
+
+Defaults to `groq-qwen` (Qwen3 32B) and `groq-scout` (Llama 4 Scout MoE). Add `groq-llama` if its daily rate limit has reset:
+
+```bash
+python scripts/run_groq_benchmark.py --models groq-llama groq-qwen groq-scout
+```
+
+Same options as the full benchmark (`--skip-multi-agent`, `--delay`, `--models`).
 
 **Output** (timestamped directory):
 ```
@@ -545,7 +568,7 @@ Supported providers: `groq`, `google`, `mistral`, `anthropic`, `openai`
 
 | Component | Estimate |
 |-----------|----------|
-| Groq API (LLaMA 3.3 70B) | Free |
+| Groq API (LLaMA 3.3 70B, Qwen3 32B, Llama 4 Scout) | Free |
 | Google Gemini 2.0 Flash | Free |
 | Mistral Large (free tier) | Free |
 | **Total (free-tier models only)** | **$0** |
