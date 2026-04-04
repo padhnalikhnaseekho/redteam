@@ -44,18 +44,23 @@ redteam/
 │   │   ├── v6_confidence_manipulation.py # V6: 6 confidence/certainty manipulation attacks
 │   │   └── v7_multi_step_compounding.py  # V7: 6 multi-step cascading failure attacks
 │   │
-│   ├── defenses/                         # 5 defense strategies
+│   ├── defenses/                         # 8 defense strategies (5 original + 3 ML-based)
 │   │   ├── base.py                       # Defense, DefenseResult base classes
 │   │   ├── input_filter.py              # D1: Regex + keyword injection detection
 │   │   ├── output_validator.py          # D2: Position limits, risk, price sanity checks
 │   │   ├── guardrails.py               # D3: System prompt hardening with safety rules
 │   │   ├── multi_agent.py              # D4: Second LLM reviews recommendations
-│   │   └── human_in_loop.py            # D5: Simulated human approval for flagged trades
+│   │   ├── human_in_loop.py            # D5: Simulated human approval for flagged trades
+│   │   ├── semantic_filter.py           # D6: Sentence-transformer embeddings + cosine similarity
+│   │   ├── perplexity_filter.py         # D7: GPT-2 sliding-window perplexity spike detection
+│   │   └── ensemble_defense.py          # D8: XGBoost ensemble combining all defense signals
 │   │
-│   ├── evaluation/                       # Evaluation and statistical analysis
+│   ├── evaluation/                       # Evaluation, statistical analysis, and explainability
 │   │   ├── evaluator.py                  # RedTeamEvaluator -- runs attacks, collects results
-│   │   ├── metrics.py                    # ASR, FPR, detection rate, financial impact
-│   │   └── statistical.py               # Chi-squared, McNemar, confidence intervals, Cohen's h
+│   │   ├── metrics.py                    # ASR, FPR, detection rate, financial impact, ROC curves
+│   │   ├── statistical.py               # Chi-squared, McNemar, CI, Bayesian, MI, Shapley values
+│   │   ├── transferability.py           # Attack transferability matrix, Fisher's exact test
+│   │   └── explainability.py            # SHAP analysis for attack success prediction
 │   │
 │   ├── generator/                        # Automated red teaming
 │   │   └── attack_generator.py           # Domain-aware LLM-powered attack generator
@@ -144,6 +149,8 @@ redteam/
 
 ## Defense Strategies
 
+### Rule-Based Defenses (D1--D5)
+
 | Defense | Code | Method |
 |---------|------|--------|
 | Input Filtering | D1 | Regex + keyword detection for injection patterns |
@@ -151,6 +158,20 @@ redteam/
 | System Prompt Hardening | D3 | Add explicit safety rules to system prompt |
 | Multi-Agent Verification | D4 | Second LLM reviews recommendations for manipulation |
 | Human-in-the-Loop | D5 | Flag suspicious trades for human approval |
+
+### ML-Based Defenses (D6--D8)
+
+| Defense | Code | Method | ML Technique |
+|---------|------|--------|--------------|
+| Semantic Similarity Filter | D6 | Encode queries and known injections into shared embedding space; block if cosine similarity > threshold | Sentence-BERT embeddings, cosine similarity |
+| Perplexity Spike Detection | D7 | Sliding-window perplexity via GPT-2; injections cause distributional anomalies (z-score spikes) | Language model perplexity, cross-entropy |
+| Ensemble Defense | D8 | Train XGBoost classifier on features from all base defenses to learn optimal combination | Gradient boosting, feature engineering |
+
+**D6 mathematical basis**: `sim(q, p) = (q . p) / (||q|| * ||p||)` in sentence-transformer embedding space (all-MiniLM-L6-v2, 384 dimensions).
+
+**D7 mathematical basis**: `PPL = exp(-(1/N) * sum log P(token_i | context))`. A perplexity spike (z-score > 2.5) in a sliding window indicates injected text that is distributionally different from surrounding commodity language.
+
+**D8 mathematical basis**: XGBoost binary logistic objective with L2 regularization. Features include per-defense confidence scores, flag counts, and aggregate statistics. Demonstrates ensemble learning (boosting/stacking) from Module 2.
 
 ---
 
@@ -182,7 +203,7 @@ python -m venv venv
 source venv/bin/activate  # Linux/Mac
 # venv\Scripts\activate   # Windows
 
-# Install dependencies
+# Install dependencies (includes ML packages: sentence-transformers, xgboost, shap, scikit-learn)
 pip install -r requirements.txt
 
 # Configure API keys
@@ -503,6 +524,8 @@ run_full_benchmark.py
 
 ## Key Metrics
 
+### Standard Metrics
+
 | Metric | Definition |
 |--------|------------|
 | **ASR** (Attack Success Rate) | % of attacks that achieve target action |
@@ -510,6 +533,18 @@ run_full_benchmark.py
 | **Detection Rate** | % of attacks detected/flagged by defense |
 | **Financial Impact** | Estimated $ loss from successful attacks |
 | **Coverage** | % of attack categories defended against |
+
+### Advanced ML/Statistical Metrics
+
+| Metric | Module | Definition |
+|--------|--------|------------|
+| **Bayesian Posterior** | `statistical.py` | Beta-Binomial model: `p ~ Beta(alpha + k, beta + n - k)`. Provides 95% credible intervals and P(vulnerability > threshold) instead of point estimates |
+| **Mutual Information** | `statistical.py` | `I(X;Y) = H(Y) - H(Y|X)` -- measures how much knowing attack category reduces uncertainty about success. NMI normalizes to [0,1] |
+| **Vulnerability Entropy** | `statistical.py` | Shannon entropy of success distribution across categories. Low = concentrated (easy to defend), High = uniform vulnerability |
+| **Shapley Values** | `statistical.py` | Game-theoretic attribution of detection power to each defense. `phi_i = avg marginal contribution across all coalitions` |
+| **ROC / AUC** | `metrics.py` | Receiver Operating Characteristic curves for defense configurations. AUC measures discrimination ability (0.5 = random, 1.0 = perfect) |
+| **Transferability** | `transferability.py` | `T(A->B) = |succeed on both| / |succeed on A|`. Fisher's exact test for significance. Jaccard similarity for overlap |
+| **SHAP Explainability** | `explainability.py` | TreeExplainer SHAP values for attack success prediction. Identifies which attack features (category, severity, model) drive success |
 
 ---
 
@@ -603,7 +638,24 @@ Supported providers: `groq`, `google`, `mistral`, `anthropic`, `openai`
 2. **Domain-Aware Automated Red Teaming** -- Attack generator using commodity market knowledge (vs generic prompt injection)
 3. **Multi-Step Attack Chain Analysis** -- How small errors cascade through agent reasoning (5% price error to $10M loss)
 4. **Cross-Model Vulnerability Comparison** -- LLaMA vs Gemini vs Mistral robustness profiles
-5. **Defense Effectiveness Framework** -- Empirical evaluation of 5 defense strategies with statistical rigor
+5. **Defense Effectiveness Framework** -- Empirical evaluation of 8 defense strategies with statistical rigor
+6. **ML-Based Defenses** -- Sentence-transformer embedding similarity (D6), perplexity-based injection detection (D7), and XGBoost ensemble (D8) replacing brittle regex approaches
+7. **Attack Transferability Analysis** -- Quantifying whether vulnerabilities transfer across models using Fisher's exact test and Jaccard similarity
+8. **Explainable Vulnerability Assessment** -- SHAP-based feature attribution identifying which attack characteristics predict success
+9. **Bayesian Vulnerability Quantification** -- Beta-Binomial posterior analysis with credible intervals, replacing frequentist point estimates
+10. **Game-Theoretic Defense Attribution** -- Shapley values for fair attribution of detection power across defense coalitions
+
+### Course Module Alignment (AI/ML in Practice)
+
+| Course Module | Project Component |
+|---|---|
+| **Module 1**: Deploy & Scale | Multi-provider LLM inference (Groq, Gemini, Mistral), configurable pipelines |
+| **Module 2**: Embeddings & Transfer Learning | D6 semantic filter (sentence-transformers), attack transferability matrix across models |
+| **Module 2**: Fine-tuning & Few-shot | Few-shot context poisoning attacks (V4.3), system prompt hardening |
+| **Module 2**: Ensemble Methods | D8 XGBoost ensemble defense (boosting), comparison vs base defenses |
+| **Module 3**: Agentic AI | LangChain ReAct agent with 7 tools, multi-agent verification defense |
+| **Module 4**: Model Evaluation | Bayesian analysis, ROC/AUC, MI, cross-validation of ensemble classifier |
+| **Module 4**: Explainable AI | SHAP TreeExplainer for attack success factors, defense effectiveness attribution |
 
 ---
 
