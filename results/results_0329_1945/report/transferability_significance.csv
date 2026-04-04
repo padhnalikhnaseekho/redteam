@@ -1,0 +1,2 @@
+model_a,model_b,transfer_a_to_b,transfer_b_to_a,jaccard_similarity,both_succeed,a_only,b_only,both_fail,odds_ratio,fisher_p_value,significant_005
+groq-qwen,groq-scout,0.6316,0.5714,0.4286,12,7,9,22,4.1905,0.022117,True

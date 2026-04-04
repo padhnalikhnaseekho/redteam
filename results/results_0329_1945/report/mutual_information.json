@@ -1,0 +1,122 @@
+{
+  "category": {
+    "mutual_information": 0.055639,
+    "normalized_mi": 0.062886,
+    "entropy_feature": 2.773857,
+    "entropy_target": 0.884755,
+    "conditional_entropy_target_given_feature": 0.829116,
+    "information_gain_pct": 6.29,
+    "per_value": {
+      "v1_direct_injection": {
+        "count": 112,
+        "success_rate": 0.3839
+      },
+      "v2_indirect_injection": {
+        "count": 140,
+        "success_rate": 0.1214
+      },
+      "v3_tool_manipulation": {
+        "count": 98,
+        "success_rate": 0.2653
+      },
+      "v4_context_poisoning": {
+        "count": 70,
+        "success_rate": 0.3143
+      },
+      "v5_reasoning_hijacking": {
+        "count": 112,
+        "success_rate": 0.4375
+      },
+      "v6_confidence_manipulation": {
+        "count": 84,
+        "success_rate": 0.4643
+      },
+      "v7_multi_step_compounding": {
+        "count": 84,
+        "success_rate": 0.1905
+      }
+    }
+  },
+  "severity": {
+    "mutual_information": 0.021869,
+    "normalized_mi": 0.024718,
+    "entropy_feature": 1.756624,
+    "entropy_target": 0.884755,
+    "conditional_entropy_target_given_feature": 0.862886,
+    "information_gain_pct": 2.47,
+    "per_value": {
+      "critical": {
+        "count": 196,
+        "success_rate": 0.2194
+      },
+      "high": {
+        "count": 252,
+        "success_rate": 0.3254
+      },
+      "medium": {
+        "count": 224,
+        "success_rate": 0.308
+      },
+      "low": {
+        "count": 28,
+        "success_rate": 0.6429
+      }
+    }
+  },
+  "model": {
+    "mutual_information": 0.001786,
+    "normalized_mi": 0.002019,
+    "entropy_feature": 1.0,
+    "entropy_target": 0.884755,
+    "conditional_entropy_target_given_feature": 0.882969,
+    "information_gain_pct": 0.2,
+    "per_value": {
+      "groq-qwen": {
+        "count": 350,
+        "success_rate": 0.3257
+      },
+      "groq-scout": {
+        "count": 350,
+        "success_rate": 0.28
+      }
+    }
+  },
+  "defense": {
+    "mutual_information": 0.061459,
+    "normalized_mi": 0.069464,
+    "entropy_feature": 2.807355,
+    "entropy_target": 0.884755,
+    "conditional_entropy_target_given_feature": 0.823296,
+    "information_gain_pct": 6.95,
+    "per_value": {
+      "input_filter+output_validator+guardrails+human_in_loop+multi_agent": {
+        "count": 100,
+        "success_rate": 0.06
+      },
+      "guardrails": {
+        "count": 100,
+        "success_rate": 0.37
+      },
+      "human_in_loop": {
+        "count": 100,
+        "success_rate": 0.39
+      },
+      "input_filter": {
+        "count": 100,
+        "success_rate": 0.43
+      },
+      "multi_agent": {
+        "count": 100,
+        "success_rate": 0.2
+      },
+      "none": {
+        "count": 100,
+        "success_rate": 0.4
+      },
+      "output_validator": {
+        "count": 100,
+        "success_rate": 0.27
+      }
+    }
+  }
+}

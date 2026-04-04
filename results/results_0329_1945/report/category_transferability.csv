@@ -1,0 +1,8 @@
+category,model_a,model_b,transfer_rate,n_attacks_a,n_shared
+v1_direct_injection,groq-qwen,groq-scout,0.75,4,3
+v2_indirect_injection,groq-qwen,groq-scout,0.0,4,0
+v3_tool_manipulation,groq-qwen,groq-scout,1.0,2,2
+v4_context_poisoning,groq-qwen,groq-scout,1.0,1,1
+v5_reasoning_hijacking,groq-qwen,groq-scout,0.75,4,3
+v6_confidence_manipulation,groq-qwen,groq-scout,1.0,3,3
+v7_multi_step_compounding,groq-qwen,groq-scout,0.0,1,0
