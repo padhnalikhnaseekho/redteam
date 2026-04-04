@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Optional
 
+import numpy as np
 import pandas as pd
 
 
@@ -158,3 +159,99 @@ def defense_coverage(
         fill_value=0.0,
     )
     return pivot
+
+
+# ─── ROC Analysis for Defenses ──────────────────────────────────────
+
+
+def defense_roc_analysis(
+    results: list[dict[str, Any]] | pd.DataFrame,
+) -> dict[str, dict[str, Any]]:
+    """Compute ROC curves treating defense confidence as classifier score.
+
+    For each defense configuration, sweeps the confidence threshold
+    and computes TPR (sensitivity) and FPR (1 - specificity).
+
+    ROC AUC interpretation:
+        - 0.5 = random classifier (defense is useless)
+        - 0.7-0.8 = acceptable discrimination
+        - 0.8-0.9 = excellent
+        - >0.9 = outstanding
+
+    Requires 'defense_confidence' field in results (the confidence score
+    from the defense at the time of evaluation). If not available, uses
+    the binary detected/success fields to compute a single ROC point.
+
+    Returns:
+        Dict mapping defense name -> {fpr, tpr, thresholds, auc, n_attacks, n_detected}.
+    """
+    df = _to_df(results)
+    if df.empty or "defense" not in df.columns:
+        return {}
+
+    roc_data = {}
+
+    for defense_name, group_df in df.groupby("defense"):
+        if defense_name == "none":
+            continue
+
+        # Ground truth: was this actually an attack? (all entries are attacks)
+        y_true = group_df["success"].astype(int).values  # 1 = successful attack
+
+        # If we have confidence scores, use them for ROC
+        if "defense_confidence" in group_df.columns:
+            y_scores = group_df["defense_confidence"].fillna(0.5).values
+            # Higher confidence = more likely defense catches it
+            # Invert: we want to detect attacks, so score = 1 - confidence(allowed)
+
+            from sklearn.metrics import roc_curve, roc_auc_score
+
+            # y_true = 1 means attack succeeded (defense MISSED it)
+            # y_scores = defense confidence that it's allowed
+            # We want: detected (y_pred=1) when attack present (y_true=1)
+            # So use detected column as prediction
+            y_detected = group_df["detected"].astype(int).values
+            if len(np.unique(y_true)) < 2 or len(np.unique(y_detected)) < 2:
+                # Can't compute ROC with single class
+                roc_data[str(defense_name)] = {
+                    "auc": 0.5,
+                    "n_attacks": len(group_df),
+                    "note": "Single class - ROC undefined",
+                }
+                continue
+
+            fpr, tpr, thresholds = roc_curve(y_true, y_scores)
+            auc = roc_auc_score(y_true, y_scores)
+
+            roc_data[str(defense_name)] = {
+                "fpr": fpr.tolist(),
+                "tpr": tpr.tolist(),
+                "thresholds": thresholds.tolist(),
+                "auc": round(float(auc), 4),
+                "n_attacks": len(group_df),
+                "n_detected": int(group_df["detected"].sum()),
+            }
+        else:
+            # Binary only: single point on ROC space
+            n = len(group_df)
+            n_attacks = int(group_df["success"].sum())
+            n_detected = int(group_df["detected"].sum()) if "detected" in group_df.columns else 0
+
+            tpr = n_detected / n_attacks if n_attacks > 0 else 0.0
+            # FPR requires legitimate queries -- approximate from non-successful attacks
+            n_legit = n - n_attacks
+            n_false_positive = int(
+                ((group_df["detected"] == True) & (group_df["success"] == False)).sum()
+            ) if "detected" in group_df.columns else 0
+            fpr = n_false_positive / n_legit if n_legit > 0 else 0.0
+
+            roc_data[str(defense_name)] = {
+                "tpr": tpr,
+                "fpr": fpr,
+                "auc": round((1 + tpr - fpr) / 2, 4),  # Approximate AUC from single point
+                "n_attacks": n,
+                "n_detected": n_detected,
+                "note": "Single operating point (no confidence scores)",
+            }
+
+    return roc_data

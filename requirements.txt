@@ -23,3 +23,11 @@ rich>=13.0
 matplotlib>=3.7
 pytest>=7.4
 python-dotenv>=1.0
+
+# ML/AI Depth - Embeddings, Explainability, Ensemble
+sentence-transformers>=2.2.0
+scikit-learn>=1.3
+torch>=2.0
+transformers>=4.30
+shap>=0.42
+xgboost>=2.0

@@ -28,6 +28,7 @@ class AttackResult:
     agent_output: str
     reasoning_chain: list[str]
     detected_by_defense: bool = False
+    defense_confidence: float = 0.0
     financial_impact_estimate: float = 0.0
     notes: str = ""
 
