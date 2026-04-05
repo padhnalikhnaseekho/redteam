@@ -1,0 +1,114 @@
+{
+  "experiment": "Defense Layering",
+  "model": "groq-qwen",
+  "conditions": {
+    "A_no_defense": {
+      "n": 50,
+      "success": 18,
+      "blocked": 0,
+      "asr": 0.36,
+      "ci_95": [
+        0.2414,
+        0.4986
+      ],
+      "financial_impact": 106500000.0,
+      "bayesian_mean": 0.3654,
+      "bayesian_ci": [
+        0.2413,
+        0.4993
+      ]
+    },
+    "B_rule_based": {
+      "n": 50,
+      "success": 6,
+      "blocked": 30,
+      "asr": 0.12,
+      "ci_95": [
+        0.0562,
+        0.238
+      ],
+      "financial_impact": 30000000.0,
+      "bayesian_mean": 0.1346,
+      "bayesian_ci": [
+        0.057,
+        0.2387
+      ]
+    },
+    "C_ml_based": {
+      "n": 50,
+      "success": 12,
+      "blocked": 26,
+      "asr": 0.24,
+      "ci_95": [
+        0.143,
+        0.3741
+      ],
+      "financial_impact": 59500000.0,
+      "bayesian_mean": 0.25,
+      "bayesian_ci": [
+        0.1433,
+        0.3749
+      ]
+    },
+    "D_all_combined": {
+      "n": 50,
+      "success": 4,
+      "blocked": 42,
+      "asr": 0.08,
+      "ci_95": [
+        0.0316,
+        0.1884
+      ],
+      "financial_impact": 18000000.0,
+      "bayesian_mean": 0.0962,
+      "bayesian_ci": [
+        0.0326,
+        0.1888
+      ]
+    }
+  },
+  "pairwise_tests": [
+    {
+      "a": "A_no_defense",
+      "b": "B_rule_based",
+      "chi2": 6.6338,
+      "p_value": 0.010006,
+      "sig": "*"
+    },
+    {
+      "a": "A_no_defense",
+      "b": "C_ml_based",
+      "chi2": 1.1905,
+      "p_value": 0.275234,
+      "sig": "ns"
+    },
+    {
+      "a": "A_no_defense",
+      "b": "D_all_combined",
+      "chi2": 9.8485,
+      "p_value": 0.0017,
+      "sig": "**"
+    },
+    {
+      "a": "B_rule_based",
+      "b": "C_ml_based",
+      "chi2": 1.6938,
+      "p_value": 0.193105,
+      "sig": "ns"
+    },
+    {
+      "a": "B_rule_based",
+      "b": "D_all_combined",
+      "chi2": 0.1111,
+      "p_value": 0.738883,
+      "sig": "ns"
+    },
+    {
+      "a": "C_ml_based",
+      "b": "D_all_combined",
+      "chi2": 3.6458,
+      "p_value": 0.05621,
+      "sig": "ns"
+    }
+  ]
+}
