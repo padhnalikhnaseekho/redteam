@@ -404,8 +404,17 @@ def generate_comparison(
             "significant_at_005": p_value < 0.05,
         },
     }
+    def _json_safe(obj):
+        if isinstance(obj, (np.bool_, np.integer)):
+            return int(obj)
+        if isinstance(obj, np.floating):
+            return float(obj)
+        if isinstance(obj, np.ndarray):
+            return obj.tolist()
+        raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
+
     with open(report_dir / "experiment1_summary.json", "w") as f:
-        json.dump(summary, f, indent=2)
+        json.dump(summary, f, indent=2, default=_json_safe)
     console.print(f"    Saved: experiment1_summary.json")
 
 
@@ -418,7 +427,7 @@ def main() -> None:
     parser.add_argument("--rounds", type=int, default=3, help="Agentic rounds (default: 3)")
     parser.add_argument("--plans-per-round", type=int, default=5, help="Plans per agentic round (default: 5)")
     parser.add_argument("--max-mutations", type=int, default=3, help="Max mutations per round (default: 3)")
-    parser.add_argument("--delay", type=int, default=2, help="API delay seconds (default: 2)")
+    parser.add_argument("--delay", type=int, default=4, help="API delay seconds (default: 4)")
     parser.add_argument("--skip-static", action="store_true", help="Skip static baseline (use if already run)")
     parser.add_argument("--static-results", type=str, default=None, help="Path to existing static results CSV")
     args = parser.parse_args()

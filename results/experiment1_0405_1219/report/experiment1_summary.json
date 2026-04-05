@@ -1,0 +1,39 @@
+{
+  "experiment": "Experiment 1: Static vs Agentic Red Teaming",
+  "target_model": "groq-scout",
+  "static": {
+    "n_attacks": 50,
+    "n_success": 21,
+    "asr": 0.42,
+    "ci_95": [
+      0.29375,
+      0.557666
+    ],
+    "bayesian_posterior_mean": 0.423077,
+    "bayesian_ci_95": [
+      0.293455,
+      0.558307
+    ]
+  },
+  "agentic": {
+    "n_attacks": 27,
+    "n_success": 0,
+    "asr": 0.0,
+    "ci_95": [
+      0.0,
+      0.124555
+    ],
+    "bayesian_posterior_mean": 0.034483,
+    "bayesian_ci_95": [
+      0.000904,
+      0.123436
+    ],
+    "avg_steps_to_success": 0
+  },
+  "comparison": {
+    "asr_delta": -0.42,
+    "chi2": 13.5469,
+    "p_value": 0.000233,
+    "significant_at_005": 1
+  }
+}
