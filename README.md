@@ -223,9 +223,91 @@ cp .env.example .env
 
 ---
 
-## Quick Start: End-to-End Benchmark
+## Quick Start (Recommended)
 
-Run the full pipeline in a single command:
+There are **3 main scripts** depending on what you want to do. All use Groq free tier (zero cost).
+
+### 1. Experiment 1: Static vs Agentic Red Teaming (GO-TO SCRIPT)
+
+**This is the primary experiment.** Runs both static (v1) and agentic (v2) attacks against the same target, then produces comparison plots, statistical tests, and a PPTX report.
+
+```bash
+# Full experiment: static baseline + agentic loop + comparison
+python scripts/run_experiment1.py
+
+# Recommended: use qwen as attacker (more creative), scout as target (more robust)
+python scripts/run_experiment1.py --target-model groq-scout --attacker-model groq-qwen --delay 5
+
+# If you already ran the v1 benchmark, skip re-running static attacks:
+python scripts/run_experiment1.py --skip-static --delay 5
+
+# Generate the PPTX report after experiment completes:
+python scripts/create_experiment1_pptx.py
+```
+
+**What it does:**
+1. **Condition A (Static)**: Runs 50 predefined single-turn attacks from the v1 attack library
+2. **Condition B (Agentic)**: Runs the v2 planner -> attacker -> critic -> mutator loop (3 rounds, adaptive)
+3. **Comparison**: Chi-squared test, Bayesian posteriors, confidence intervals, 3-panel plot
+
+**Output** (in `results/experiment1_MMDD_HHMM/`):
+```
+experiment1_MMDD_HHMM/
+├── static_results.json              # Condition A raw results
+├── agentic_results.json             # Condition B raw results
+└── report/
+    ├── experiment1_comparison.png    # 3-panel comparison plot
+    ├── experiment1_all_results.csv   # Combined CSV
+    ├── experiment1_summary.json      # Stats: ASR, CI, chi-squared, Bayesian
+    └── Experiment1_Results.pptx      # 8-slide presentation
+```
+
+**Important: Groq rate limits.** Use `--delay 5` (5 seconds between API calls) to avoid 429 errors. Use different models for attacker vs target so they use separate rate limit quotas (e.g., `--attacker-model groq-qwen --target-model groq-scout`).
+
+---
+
+### 2. V1 Defense Benchmark (Static Attacks x All Defenses x All Models)
+
+Runs the 50 predefined attacks against each model with each defense configuration. Produces per-defense ASR comparison.
+
+```bash
+# Groq only (free, recommended)
+python scripts/run_groq_benchmark.py
+
+# All models (requires Mistral/Anthropic keys)
+python scripts/run_full_benchmark.py --skip-multi-agent
+```
+
+### 3. Advanced ML Analysis (No API calls, runs on existing results)
+
+Runs Bayesian analysis, mutual information, SHAP explainability, transferability, and Shapley values on existing benchmark results. **Instant, no API calls needed.**
+
+```bash
+python scripts/run_advanced_analysis.py
+python scripts/run_advanced_analysis.py --results-dir results/results_0329_1945
+```
+
+---
+
+## All Scripts Reference
+
+| Script | Purpose | API Calls | Time |
+|--------|---------|-----------|------|
+| **`run_experiment1.py`** | **Primary experiment: static vs agentic comparison** | Yes (Groq free) | ~15-30 min |
+| `create_experiment1_pptx.py` | Generate PPTX from experiment 1 results | No | Instant |
+| `run_groq_benchmark.py` | V1 benchmark: 50 attacks x defenses x Groq models | Yes (Groq free) | ~30-60 min |
+| `run_full_benchmark.py` | V1 benchmark: all models including paid | Yes (mixed) | ~60-90 min |
+| `run_auto_redteam.py` | V2 agentic loop only (no static comparison) | Yes (Groq free) | ~10-20 min |
+| `run_advanced_analysis.py` | ML analysis on existing results (Bayesian, SHAP, MI) | **No** | Instant |
+| `generate_report.py` | Generate plots from v1 benchmark results | No | Instant |
+| `generate_pptx.py` | Generate PPTX from v1 benchmark results | No | Instant |
+| `create_merged_pptx.py` | Merge v1 results + appendix into combined deck | No | Instant |
+
+---
+
+## Legacy: V1 Benchmark Details
+
+Run the full v1 pipeline in a single command:
 
 ```bash
 python scripts/run_full_benchmark.py
@@ -236,13 +318,11 @@ This executes all steps automatically:
 1. Loads 50 attacks from the registry
 2. For each model (groq-llama, mistral-large):
    - Runs 50 attacks with **no defense**
-   - Runs 50 attacks with each **individual defense** (D1--D5)
+   - Runs 50 attacks with each **individual defense** (D1--D8)
    - Runs 50 attacks with **all defenses combined**
 3. Saves per-run JSON + CSV results
 4. Generates combined CSV and summary CSV
 5. Generates report with PNG plots and statistical analysis
-
-**Total**: 14 runs (7 defense configs x 2 models), 700 attack evaluations.
 
 **Options**:
 ```bash
