@@ -406,6 +406,8 @@ def main() -> None:
     parser.add_argument("--selection", default="epsilon_greedy", choices=["epsilon_greedy", "softmax"],
                         help="Strategy selection policy (default: epsilon_greedy)")
     parser.add_argument("--evolve-k", type=int, default=5, help="Top-k for evolution selection (default: 5)")
+    parser.add_argument("--seed-from", type=str, default=None,
+                        help="Path to a previous v3 results dir to continue learning from (loads strategy_db, reflections, archive)")
     args = parser.parse_args()
 
     # Setup
@@ -413,6 +415,20 @@ def main() -> None:
     project_dir = Path(__file__).resolve().parents[1]
     results_dir = project_dir / "results" / f"auto_redteam_v3_{timestamp}"
     results_dir.mkdir(parents=True, exist_ok=True)
+
+    # Seed from previous run if requested
+    if args.seed_from:
+        import shutil
+        seed_dir = Path(args.seed_from)
+        if not seed_dir.is_absolute():
+            seed_dir = project_dir / seed_dir
+        for fname in ("strategy_db.json", "reflections.json", "attack_archive.json"):
+            src = seed_dir / fname
+            if src.exists():
+                shutil.copy2(src, results_dir / fname)
+                console.print(f"  [cyan]Seeded {fname} from {seed_dir.name}[/cyan]")
+            else:
+                console.print(f"  [yellow]Warning: {fname} not found in {seed_dir}[/yellow]")
 
     client = LLMClient()
 
@@ -451,6 +467,9 @@ def main() -> None:
     console.print(f"  Strategy select:  {args.selection}")
     console.print(f"  Evolution top-k:  {args.evolve_k}")
     console.print(f"  Strategies:       {len(strategy_db.all())}")
+    console.print(f"  Seed from:        {args.seed_from or 'none (fresh start)'}")
+    console.print(f"  Seeded archive:   {len(archive.all())} entries" if args.seed_from else "")
+    console.print(f"  Seeded reflect:   {len(reflection_store.all())} entries" if args.seed_from else "")
     console.print(f"  Results dir:      {results_dir}")
     console.print("=" * 60)
 
