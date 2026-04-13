@@ -11,6 +11,7 @@ class AttackCategory(str, Enum):
     V5_REASONING_HIJACKING = "v5_reasoning_hijacking"
     V6_CONFIDENCE_MANIPULATION = "v6_confidence_manipulation"
     V7_MULTI_STEP_COMPOUNDING = "v7_multi_step_compounding"
+    V8_GCG_ADVERSARIAL = "v8_gcg_adversarial"
 
 
 class Severity(str, Enum):

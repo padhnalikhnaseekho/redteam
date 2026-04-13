@@ -400,7 +400,7 @@ def main() -> None:
     parser.add_argument("--plans-per-round", type=int, default=5, help="Plans per round (default: 5)")
     parser.add_argument("--target-model", default="groq-scout", help="Target model (default: groq-scout)")
     parser.add_argument("--attacker-model", default="groq-qwen", help="Attacker/planner model (default: groq-qwen)")
-    parser.add_argument("--delay", type=int, default=2, help="API delay in seconds (default: 2)")
+    parser.add_argument("--delay", type=int, default=4, help="API delay in seconds (default: 4)")
     parser.add_argument("--max-mutations", type=int, default=3, help="Max mutations per round (default: 3)")
     parser.add_argument("--max-replans", type=int, default=2, help="Max replans per attack (default: 2)")
     parser.add_argument("--selection", default="epsilon_greedy", choices=["epsilon_greedy", "softmax"],
