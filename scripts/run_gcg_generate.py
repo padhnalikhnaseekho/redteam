@@ -101,6 +101,11 @@ def main() -> None:
         help="Torch device — 'cpu' or 'cuda' (default: cpu)",
     )
     parser.add_argument(
+        "--fp16",
+        action="store_true",
+        help="Load surrogate model in float16 (halves VRAM; required for gpt2-xl on 4 GB GPU)",
+    )
+    parser.add_argument(
         "--out",
         default=str(_CACHE_DEFAULT),
         help=f"Output cache path (default: {_CACHE_DEFAULT})",
@@ -131,6 +136,7 @@ def main() -> None:
         topk=args.topk,
         batch_size=args.batch_size,
         device=args.device,
+        fp16=args.fp16,
         cache_path=Path(args.out),
     )
 

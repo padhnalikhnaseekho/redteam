@@ -101,6 +101,7 @@ class GCGConfig:
     topk: int = 256
     batch_size: int = 128
     device: str = "cpu"
+    fp16: bool = False
     cache_path: Path = field(default_factory=lambda: _CACHE_DEFAULT)
 
 
@@ -369,10 +370,27 @@ class GCGSuffixGenerator:
         Raises any exception from model loading or _run_gcg so that `get()`
         can catch it and fall back to pre-computed suffixes.
         """
+        import urllib3
+        import requests
+        from huggingface_hub import configure_http_backend
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
+        # Corporate proxies use self-signed certs; patch the HF hub session.
+        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+        def _insecure_session() -> requests.Session:
+            s = requests.Session()
+            s.verify = False
+            return s
+        configure_http_backend(backend_factory=_insecure_session)
+
         tokenizer = AutoTokenizer.from_pretrained(self._config.surrogate_model)
-        model = AutoModelForCausalLM.from_pretrained(self._config.surrogate_model)
+        load_kwargs = {}
+        if self._config.fp16:
+            import torch
+            load_kwargs["torch_dtype"] = torch.float16
+        model = AutoModelForCausalLM.from_pretrained(
+            self._config.surrogate_model, **load_kwargs
+        )
         return _run_gcg(model, tokenizer, prefix, target, self._config)
 
 
