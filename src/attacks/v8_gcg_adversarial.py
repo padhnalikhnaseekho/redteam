@@ -372,16 +372,20 @@ class GCGSuffixGenerator:
         """
         import urllib3
         import requests
-        from huggingface_hub import configure_http_backend
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
         # Corporate proxies use self-signed certs; patch the HF hub session.
-        urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-        def _insecure_session() -> requests.Session:
-            s = requests.Session()
-            s.verify = False
-            return s
-        configure_http_backend(backend_factory=_insecure_session)
+        # configure_http_backend was added in huggingface_hub 0.20 — skip on older envs.
+        try:
+            from huggingface_hub import configure_http_backend
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+            def _insecure_session() -> requests.Session:
+                s = requests.Session()
+                s.verify = False
+                return s
+            configure_http_backend(backend_factory=_insecure_session)
+        except ImportError:
+            pass
 
         tokenizer = AutoTokenizer.from_pretrained(self._config.surrogate_model)
         load_kwargs = {}

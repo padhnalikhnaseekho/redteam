@@ -23,6 +23,7 @@ Transfer expectation:
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
@@ -150,13 +151,21 @@ def main() -> None:
         len(targets), args.model, args.steps, args.device,
     )
 
+    results: dict = {}
     for key, prefix, target in targets:
         logger.info("── key=%r ──", key)
         logger.info("  prefix : %r", prefix[:80])
         logger.info("  target : %r", target[:80])
         suffix = gen.get(key, prefix, target)
+        results[key] = suffix
         logger.info("  result : %r", suffix)
 
+    # Always write results to --out so downstream cells can read them,
+    # even when falling back to pre-computed suffixes.
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(results, f, indent=2)
     logger.info("Saved to %s", args.out)
 
 
