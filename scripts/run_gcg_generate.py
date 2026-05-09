@@ -23,6 +23,7 @@ Transfer expectation:
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import sys
 from pathlib import Path
@@ -101,6 +102,11 @@ def main() -> None:
         help="Torch device — 'cpu' or 'cuda' (default: cpu)",
     )
     parser.add_argument(
+        "--fp16",
+        action="store_true",
+        help="Load surrogate model in float16 (halves VRAM; required for gpt2-xl on 4 GB GPU)",
+    )
+    parser.add_argument(
         "--out",
         default=str(_CACHE_DEFAULT),
         help=f"Output cache path (default: {_CACHE_DEFAULT})",
@@ -131,6 +137,7 @@ def main() -> None:
         topk=args.topk,
         batch_size=args.batch_size,
         device=args.device,
+        fp16=args.fp16,
         cache_path=Path(args.out),
     )
 
@@ -144,13 +151,21 @@ def main() -> None:
         len(targets), args.model, args.steps, args.device,
     )
 
+    results: dict = {}
     for key, prefix, target in targets:
         logger.info("── key=%r ──", key)
         logger.info("  prefix : %r", prefix[:80])
         logger.info("  target : %r", target[:80])
         suffix = gen.get(key, prefix, target)
+        results[key] = suffix
         logger.info("  result : %r", suffix)
 
+    # Always write results to --out so downstream cells can read them,
+    # even when falling back to pre-computed suffixes.
+    out_path = Path(args.out)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(out_path, "w") as f:
+        json.dump(results, f, indent=2)
     logger.info("Saved to %s", args.out)
 
 
