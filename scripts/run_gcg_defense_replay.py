@@ -98,14 +98,20 @@ def build_defenses(name: str) -> list[Defense]:
             model_path = None
         else:
             model_path = str(clf_path)
-        return [EnsembleDefense(
+        defense = EnsembleDefense(
             base_defenses=[
                 InputFilterDefense(),
                 PerplexityFilterDefense(),
                 SemanticInputFilterDefense(),
             ],
             model_path=model_path,
-        )]
+        )
+        # Override the class-level name so the evaluator's _defense_label()
+        # distinguishes trained from untrained ensemble in the result rows.
+        # Without this, both configs label themselves "ensemble_defense" and
+        # the summary table merges their cells.
+        defense.name = "ensemble_trained"
+        return [defense]
     raise ValueError(f"Unknown defense config: {name!r}")
 
 

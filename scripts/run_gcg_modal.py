@@ -427,15 +427,23 @@ def main(
         metrics_path = out_dir / "ensemble_defense_training_metrics.json"
         metrics_path.write_text(json.dumps(train_metrics, indent=2, default=str))
         print(f"  wrote {metrics_path}")
-        print(f"  train_auc={train_metrics.get('train_auc'):.3f}  "
-              f"cv_auc={train_metrics.get('cv_auc_mean'):.3f}±"
-              f"{train_metrics.get('cv_auc_std'):.3f}  "
+        # Metrics travel as JSON across the Modal wire and the trainer dumps
+        # numpy scalars via default=str, so the values arrive as strings here.
+        # Coerce defensively rather than assume types.
+        def _f(v) -> float:
+            try:
+                return float(v)
+            except (TypeError, ValueError):
+                return float("nan")
+        print(f"  train_auc={_f(train_metrics.get('train_auc')):.3f}  "
+              f"cv_auc={_f(train_metrics.get('cv_auc_mean')):.3f}±"
+              f"{_f(train_metrics.get('cv_auc_std')):.3f}  "
               f"n_samples={train_metrics.get('n_samples')}")
         top_importances = list(train_metrics.get("feature_importances", {}).items())[:5]
         if top_importances:
             print("  top features:")
             for name, imp in top_importances:
-                print(f"    {name:40} {imp:.4f}")
+                print(f"    {name:40} {_f(imp):.4f}")
 
     if run_defenses:
         defense_list = [d.strip() for d in defenses.split(",") if d.strip()]

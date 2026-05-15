@@ -1,0 +1,191 @@
+✓ Initialized. View run at https://modal.com/apps/padhnalikhnaseekho/main/ap-BB5eZqbEJqzFrVA1zal0YB
+✓ Created objects.
+├── 🔨 Created mount /home/anrd/git/epgd/capstone/redteam/scripts/run_gcg_modal.py
+├── 🔨 Created mount /home/anrd/git/epgd/capstone/redteam
+├── 🔨 Created function gen_suffixes.
+├── 🔨 Created function run_transferability.
+├── 🔨 Created function train_ensemble_classifier.
+└── 🔨 Created function run_defense_replay.
+== Stage 1: skipped (--skip-gen) ==
+== Stage 2: skipped (--skip-transfer) ==
+
+== Stage 2.5: train EnsembleDefense XGBoost classifier ==
+Loaded 8 suffixes across 2 cache files
+Class sizes:  positive (GCG)=32, negative (benign)=14
+───────────────────────────── Extracting features ──────────────────────────────
+  attack 1/32
+INFO  Loading perplexity model: gpt2
+`loss_type=None` was set in the config but it is unrecognized. Using the default loss: `ForCausalLMLoss`.
+INFO  Loading sentence-transformer model: all-MiniLM-L6-v2
+INFO  No device provided, using cpu
+INFO  Loading SentenceTransformer model from sentence-transformers/all-MiniLM-L6-v2.
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00,  8.08it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00,  8.06it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 22.90it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 52.14it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 51.99it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 50.36it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 50.95it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 50.30it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 53.41it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 52.04it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 53.54it/s]
+  attack 9/32
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.91it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.59it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 51.27it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.59it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 48.51it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 50.37it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 46.64it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.40it/s]
+  attack 17/32
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 45.57it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 45.01it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 45.74it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 46.85it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.91it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 50.38it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 48.21it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 49.31it/s]
+  attack 25/32
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 46.18it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 46.65it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 45.79it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 44.90it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 46.61it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 47.46it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 45.25it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 48.40it/s]
+  benign 1/14
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 53.27it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 56.80it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 53.10it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 54.36it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 54.38it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 59.81it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]Batches: 100%|██████████| 1/1 [00:00<00:00, 59.70it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 48.14it/s]
+  benign 9/14
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 60.21it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 54.44it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 56.11it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 61.99it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 57.77it/s]
+
+[1ABatches:   0%|          | 0/1 [00:00<?, ?it/s]
+[1ABatches: 100%|██████████| 1/1 [00:00<00:00, 66.07it/s]
+─────────────────────────────── Training XGBoost ───────────────────────────────
+{
+    'train_auc': 1.0,
+    'cv_auc_mean': 0.9714285714285715,
+    'cv_auc_std': 0.05714285714285712,
+    'n_samples': 46,
+    'n_features': 15,
+    'n_attacks': 32,
+    'n_legitimate': 14,
+    'feature_importances': {
+        'query_length': np.float32(1.0),
+        'context_length': np.float32(0.0),
+        'input_filter_input_blocked': np.float32(0.0),
+        'input_filter_input_confidence': np.float32(0.0),
+        'input_filter_input_n_flags': np.float32(0.0),
+        'max_flags': np.float32(0.0),
+        'mean_confidence': np.float32(0.0),
+        'n_defenses_blocking': np.float32(0.0),
+        'perplexity_filter_input_blocked': np.float32(0.0),
+        'perplexity_filter_input_confidence': np.float32(0.0),
+        'perplexity_filter_input_n_flags': np.float32(0.0),
+        'semantic_input_filter_input_blocked': np.float32(0.0),
+        'semantic_input_filter_input_confidence': np.float32(0.0),
+        'semantic_input_filter_input_n_flags': np.float32(0.0),
+        'total_flags': np.float32(0.0)
+    }
+}
+INFO  Saved ensemble classifier to results/ensemble_defense_classifier.pkl
+Saved classifier to results/ensemble_defense_classifier.pkl
+Saved metrics to results/ensemble_defense_training_metrics.json
+  wrote /home/anrd/git/epgd/capstone/redteam/results/ensemble_defense_training_metrics.json
+  train_auc=1.000  cv_auc=0.971±0.057  n_samples=46
+  top features:
+Stopping app - uncaught exception raised locally: ValueError("Unknown format code 'f' for object of type 'str'").
+╭─────────────────────────────── Traceback (most recent call last) ────────────────────────────────╮
+│ /home/anrd/git/epgd/capstone/redteam/scripts/run_gcg_modal.py:438 in main                        │
+│                                                                                                  │
+│   437 │   │   │   for name, imp in top_importances:                                              │
+│ ❱ 438 │   │   │   │   print(f"    {name:40} {imp:.4f}")                                          │
+│   439                                                                                            │
+╰──────────────────────────────────────────────────────────────────────────────────────────────────╯
+ValueError: Unknown format code 'f' for object of type 'str'

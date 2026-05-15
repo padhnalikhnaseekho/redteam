@@ -1,0 +1,26 @@
+{
+  "train_auc": 1.0,
+  "cv_auc_mean": 0.9714285714285715,
+  "cv_auc_std": 0.05714285714285712,
+  "n_samples": 46,
+  "n_features": 15,
+  "n_attacks": 32,
+  "n_legitimate": 14,
+  "feature_importances": {
+    "query_length": "1.0",
+    "context_length": "0.0",
+    "input_filter_input_blocked": "0.0",
+    "input_filter_input_confidence": "0.0",
+    "input_filter_input_n_flags": "0.0",
+    "max_flags": "0.0",
+    "mean_confidence": "0.0",
+    "n_defenses_blocking": "0.0",
+    "perplexity_filter_input_blocked": "0.0",
+    "perplexity_filter_input_confidence": "0.0",
+    "perplexity_filter_input_n_flags": "0.0",
+    "semantic_input_filter_input_blocked": "0.0",
+    "semantic_input_filter_input_confidence": "0.0",
+    "semantic_input_filter_input_n_flags": "0.0",
+    "total_flags": "0.0"
+  }
+}

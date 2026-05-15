@@ -1,7 +1,7 @@
 # GCG Adversarial Attack — Findings Report (Update)
 **IIT Bombay EPGD AI/ML Capstone | Red-Teaming LLM-Based Commodity Trading Agents**
 Date: 2026-05-14 | Branch: m/v1 | Supersedes: GCG_findings_report_2026-05-04.md
-Latest update: 2026-05-14 PM — adds §5.5 Vicuna-7b surrogate follow-up and §5.6 defense-replay matrix.
+Latest update: 2026-05-15 — adds §5.6.7 ensemble-classifier training iteration (with XAI-detected shortcut caveat).
 
 ---
 
@@ -380,9 +380,144 @@ points toward a tested hypothesis, not a population estimate.
 | Module | Defense-replay contribution |
 |---|---|
 | Module 2 — Embeddings | Negative result: MiniLM cosine similarity catches semantic injections (v1–v4) but not token-level adversarial noise (v8 GCG). Information-content of the signal matters, not just architecture. |
-| Module 2 — Ensemble methods | Negative result: untrained voting hurts when base learners have asymmetric accuracy. Frames XGBoost-trained ensembling as the principled fix and a concrete next experiment. |
-| Module 4 — Model Evaluation | Demonstrates the sample-variance pitfall: same setup, two trials, different per-cell ASRs. Reinforces aggregate-metric primacy. |
-| Module 4 — Explainability | Perplexity-spike flag (ppl=2254) is a directly human-readable detection signal — the defense's decision is interpretable in a way that a black-box classifier's would not be. |
+| Module 2 — Ensemble methods | Two-step finding (§5.6.4 and §5.6.7): untrained voting fails on asymmetric base learners; XGBoost training restores effectiveness but XAI reveals it learned a shortcut. Both passes are pedagogically load-bearing. |
+| Module 4 — Model Evaluation | Demonstrates the sample-variance pitfall: identical setup, multiple trials, different per-cell ASRs (compare §5.6.1 baseline 25%/25%/25% vs §5.6.7.3 baseline 50%/0%/0%). Reinforces aggregate-metric primacy. |
+| Module 4 — Explainability | Two distinct uses: (a) perplexity-spike flag (ppl=2254) is a directly human-readable detection signal; (b) §5.6.7.4 XGBoost feature-importance audit caught a `query_length=1.0` shortcut that train_auc=1.0 and cv_auc=0.97 both hid. XAI as failure-mode detector, not just explanation-after-the-fact. |
+
+---
+
+### 5.6.7 Iteration 2 — Training the Ensemble Classifier
+
+The 0% detection rate of the untrained ensemble (§5.6.4) was attributed to
+unweighted voting diluting the perplexity signal. The principled fix is to
+fit `EnsembleDefense._classifier` (XGBoost) on labeled features so it learns
+the correct weight for each base defense.
+
+#### 5.6.7.1 Training setup
+
+| Component | Detail |
+|---|---|
+| Trainer | `scripts/train_ensemble_defense.py` |
+| Positive class (label 1, "block") | 4 base trading prompts × 8 GCG suffixes (gpt2-xl + Vicuna-7b caches) = 32 examples |
+| Negative class (label 0, "allow") | 4 attack-base prompts (without suffix) + 10 additional benign trading queries = 14 examples |
+| Features | 13 per example: `{input,perplexity,semantic}_input_{confidence,n_flags,blocked}` + aggregates (`n_defenses_blocking`, `mean_confidence`, `max_flags`, `query_length`, `context_length`) |
+| Model | XGBoost classifier (n_estimators=100, max_depth=4, lr=0.1) |
+| Compute | Modal CPU stage, ~30 sec feature extraction + ~2 sec fit |
+
+#### 5.6.7.2 Result — Detection restored
+
+After loading the trained classifier, the `ensemble_trained` defense matches
+`perplexity_filter` exactly on all three Groq targets:
+
+| Defense | Llama ASR / det | Qwen ASR / det | Scout ASR / det |
+|---|:---:|:---:|:---:|
+| **`ensemble` (untrained)** | 25% / 0% | 0% / 0% | 0% / 0% |
+| **`ensemble_trained` (XGBoost)** | **0% / 100%** | **0% / 100%** | **0% / 100%** |
+| `perplexity_filter` (reference) | 0% / 100% | 0% / 100% | 0% / 100% |
+
+Training metrics (`results/ensemble_defense_training_metrics.json`):
+`train_auc = 1.000`, `cv_auc = 0.971 ± 0.057`, `n_samples = 46`. The cross-
+validated AUC of 0.97 says the rule generalises across CV folds; the
+combination with the 100% replay detection rate would, at first glance, close
+the iteration.
+
+#### 5.6.7.3 Wider replay table (full 6 × 3 × 4 matrix)
+
+| Defense | Llama | Qwen | Scout | Aggregate |
+|---|:---:|:---:|:---:|:---:|
+|  | ASR / det | ASR / det | ASR / det | ASR / det |
+| `none` | 50% / 0% | 0% / 0% | 0% / 0% | **17% / 0%** |
+| `input_filter` | 0% / 0% | 0% / 0% | 25% / 0% | 8% / 0% |
+| `semantic_input_filter` | 25% / 0% | 0% / 0% | 0% / 0% | 8% / 0% |
+| `perplexity_filter` | 0% / 100% | 0% / 100% | 0% / 100% | **0% / 100%** |
+| `ensemble` (untrained) | 25% / 0% | 0% / 0% | 0% / 0% | 8% / 0% |
+| **`ensemble_trained`** | **0% / 100%** | **0% / 100%** | **0% / 100%** | **0% / 100%** |
+
+Per-cell ASRs in the `none` baseline column show a third stochastic draw
+(now Llama-only at 50%) — see §5.6.5 on sample variance. Aggregates remain
+informative; individual cells do not.
+
+#### 5.6.7.4 The catch — XAI reveals a shortcut
+
+The classifier's feature-importance audit, exposed by
+`EnsembleDefense.get_feature_importances()`, paints a much darker picture
+than the AUC and detection metrics alone:
+
+```
+top features (from results/ensemble_defense_training_metrics.json):
+  query_length                             1.0   ← all weight here
+  context_length                           0.0
+  input_filter_input_blocked               0.0
+  input_filter_input_confidence            0.0
+  input_filter_input_n_flags               0.0
+  perplexity_filter_input_blocked          0.0   ← the actual useful signal
+  perplexity_filter_input_confidence       0.0     is ignored
+  perplexity_filter_input_n_flags          0.0
+  semantic_input_filter_*                  0.0
+  n_defenses_blocking                      0.0
+```
+
+XGBoost found a shortcut: every positive (GCG) training example consists of
+`base_prompt + " " + suffix` (~+50 characters), and every negative is a
+base prompt or a benign trading question of similar or shorter length. So
+the decision rule it learned is approximately:
+
+> `if query_length > ~150: block else: allow`
+
+This is a textbook **shortcut-learning / spurious-correlate** failure. The
+classifier achieves 100% detection on GCG attacks (which are all long) and
+0% false positives on benign queries (which happen to all be shorter), but
+the mechanism has nothing to do with the perplexity, semantic, or input
+filter signals that the ensemble was supposed to fuse.
+
+#### 5.6.7.5 Why the metrics hid the bug
+
+`train_auc = 1.0` and `cv_auc = 0.971 ± 0.057` are exactly the metrics one
+would compute to validate a classifier — and both look excellent. The CV
+folds also use the same length-confounded splits, so cross-validation
+**inherits the shortcut**.
+
+This is the Module-4 XAI lesson in negative form: **a high AUC tells you
+the model fits the data; only feature attribution tells you it fits for
+the right reason.** Had we shipped on AUC alone, the defense would
+generalise poorly to:
+
+- a long benign trading query (e.g. a structured multi-section market
+  report) → false positive
+- a short adversarial attack (e.g. a 5-token suffix) → false negative
+- an attack with the suffix *prepended* rather than appended → same
+  length but maybe slipped through the wrong threshold
+
+The XGBoost classifier "works" in production *only* on the very specific
+distribution of (long suffix + short benign) it was trained on.
+
+#### 5.6.7.6 Next iteration (queued)
+
+Two paths, listed in order of cost/benefit:
+
+1. **Drop length features at training time.** Remove `query_length` and
+   `context_length` from the feature dict in
+   `EnsembleDefense._extract_features` (or filter them out in the trainer).
+   Forces XGBoost to use the 9 defense-derived features. With perplexity
+   being highly discriminative (PPL=2254 vs ~40 for benign), the classifier
+   should converge to a perplexity-dominant rule that is faithful to the
+   ensemble's design intent.
+
+2. **Augment the training distribution.** Add long benign trading prompts
+   (multi-paragraph reports) and short adversarial attacks to the training
+   set so the length correlation is broken. More expensive but produces a
+   more robust classifier.
+
+Pass 1 is the cheaper next step; pass 2 is the more rigorous one.
+
+#### 5.6.7.7 Status of iteration
+
+| Iteration | Outcome | Next |
+|---|---|---|
+| §5.6.4 — untrained ensemble | 0% detection (paradox) | train classifier |
+| §5.6.7.2 — XGBoost-trained ensemble | 100% detection, 0.97 cv_auc | audit features |
+| §5.6.7.4 — feature-importance audit | shortcut: `query_length=1.0` dominates | drop length features and retrain |
+| §5.6.7.6 — drop-length retrain | **pending** | — |
 
 ---
 
@@ -428,8 +563,9 @@ The corrected number (0% off-diagonal) should be cited going forward; the prior 
 ### Immediate (this week, blocking the final presentation)
 - [x] **Vicuna-7b surrogate run** — completed 2026-05-14 PM. See §5.5. Outcome: 50% ASR on Llama-3.3, 0% elsewhere. Hypothesis of 20-40% pairwise transfer was refined: lineage-specific, not pairwise.
 - [x] **Defense replay** — completed 2026-05-14 PM. See §5.6. Outcome: `perplexity_filter` 100% detection / 0% ASR; lexical/semantic filters useless; ensemble paradoxically worse than its best component due to untrained voting.
+- [x] **Train EnsembleDefense classifier** — completed 2026-05-15. See §5.6.7. Restored ensemble to 100% detection (matches perplexity_filter), but XAI revealed the classifier learned `query_length` as a shortcut, not the perplexity signal. Needs a drop-length-features pass.
+- [ ] **Drop length features and retrain ensemble** — straightforward follow-up to §5.6.7.6. One-line filter in `train_ensemble_defense.py`, then re-run defense replay. Should land a properly-grounded ensemble that's robust beyond the suffix-length distribution.
 - [ ] **Gemini key fix.** Either provision a billed Google project or rotate to a fresh free-tier key, then re-include `gemini-flash` in the model list to measure cross-family transfer.
-- [ ] **Train EnsembleDefense classifier** on the 60-cell defense replay data (§5.6.4 recommended fix). Should restore ensemble to ≥ perplexity_filter alone while preserving generalisation to non-GCG attacks.
 
 ### For the write-up
 - [ ] Update slide deck to show the *paired* matrices (2026-05-04 superseded vs. 2026-05-14 corrected) — the methodology-correction story is more interesting than either single matrix in isolation.
@@ -453,8 +589,11 @@ The corrected number (0% off-diagonal) should be cited going forward; the prior 
 | `results/gcg_suffix_cache_gpt2xl.json` | 2026-05-14 AM gpt2-xl GCG-generated suffixes |
 | `results/gcg_suffix_cache_lmsys_vicuna_7b_v1_5.json` | 2026-05-14 PM Vicuna-7b GCG-generated suffixes (§5.5) |
 | `results/gcg_transferability.json` | 2026-05-14 PM per-attack × model results + matrices (Vicuna run, 3 Groq targets) |
-| `results/gcg_defense_replay.json` | 2026-05-14 PM defense × model × attack matrix (§5.6); 60 rows, per-row success/detected/confidence/flags |
-| `scripts/run_gcg_defense_replay.py` | Defense replay runner — loops over `--defenses [none input_filter perplexity_filter semantic_input_filter ensemble]` |
+| `results/gcg_defense_replay.json` | Defense × model × attack matrix (§5.6, §5.6.7); 72 rows after 2026-05-15 re-run with `ensemble_trained` cleanly labelled |
+| `results/ensemble_defense_classifier.pkl` | Joblib-serialised trained XGBoost classifier consumed by `EnsembleDefense._load_classifier` (§5.6.7) |
+| `results/ensemble_defense_training_metrics.json` | Training metrics: train_auc, cv_auc, feature_importances (§5.6.7.4 audit source) |
+| `scripts/run_gcg_defense_replay.py` | Defense replay runner — loops over `--defenses [none input_filter perplexity_filter semantic_input_filter ensemble ensemble_trained]` |
+| `scripts/train_ensemble_defense.py` | XGBoost trainer for `EnsembleDefense` (§5.6.7); generates positive/negative training set, fits, persists classifier + metrics |
 | `log/modal_20260514_*.log` | Per-run Modal logs (image build, GPU info, GCG progress, transferability output) |
 | `results/GCG_findings_report_2026-05-04.md` | Prior report (now superseded; retain for methodology-correction comparison) |
 
