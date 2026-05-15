@@ -355,8 +355,9 @@ class GCGSuffixGenerator:
                 return suffix
             except Exception as exc:
                 logger.warning(
-                    "GCG online generation failed (%s) — falling back to pre-computed suffix",
-                    exc.__class__.__name__,
+                    "GCG online generation failed (%s: %s) — falling back to pre-computed suffix",
+                    exc.__class__.__name__, exc,
+                    exc_info=True,
                 )
 
         # Offline fallback: pre-computed suffixes from PRECOMPUTED_SUFFIXES
