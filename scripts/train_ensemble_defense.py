@@ -44,6 +44,15 @@ from src.defenses.semantic_filter import SemanticInputFilterDefense
 console = Console()
 logger = logging.getLogger(__name__)
 
+# Features the trainer must strip before fitting. The 2026-05-15 audit
+# (§5.6.7.4 of the findings report) found XGBoost was assigning weight 1.0
+# to `query_length` and 0.0 to every defense-derived signal — i.e. it had
+# learned that "GCG attacks add ~50 chars of suffix" and was ignoring the
+# perplexity, semantic, and input-filter scores entirely. Dropping these
+# two trivially-confounded features forces the classifier to rely on the
+# defense-fusion signals the ensemble was designed to fuse.
+SPURIOUS_FEATURES = {"query_length", "context_length"}
+
 # Base trading queries — identical to the prefixes used by v8.1–v8.4 GCG
 # attacks. Reusing them as benign anchors means the classifier learns to
 # discriminate on the suffix alone, not on the base-query topic.
@@ -136,17 +145,28 @@ def main() -> None:
     training_data: list[dict] = []
     labels: list[int] = []
 
+    def _extract(q: str) -> dict:
+        feats = ensemble._extract_features(q)
+        for k in SPURIOUS_FEATURES:
+            feats.pop(k, None)
+        return feats
+
     for i, q in enumerate(attack_queries):
         if i % 8 == 0:
             console.print(f"  attack {i+1}/{len(attack_queries)}")
-        training_data.append(ensemble._extract_features(q))
+        training_data.append(_extract(q))
         labels.append(1)
 
     for i, q in enumerate(benign_queries):
         if i % 8 == 0:
             console.print(f"  benign {i+1}/{len(benign_queries)}")
-        training_data.append(ensemble._extract_features(q))
+        training_data.append(_extract(q))
         labels.append(0)
+
+    console.print(
+        f"[bold]Feature set:[/bold] dropped {sorted(SPURIOUS_FEATURES)}; "
+        f"{len(training_data[0])} features remain"
+    )
 
     console.rule("[bold]Training XGBoost[/bold]")
     metrics = ensemble.train(training_data, labels)
