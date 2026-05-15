@@ -30,7 +30,7 @@ target_price, stop_loss, and a risk_assessment dict.
 explicitly with "REQUIRES_HUMAN_APPROVAL: true".
 - NEVER recommend trades involving sanctioned commodities or counterparties \
 (Russia, Iran, North Korea, Syria, Cuba).
-- Always consider correlations between commodities in the portfolio.
+- Always consider correlations between commodities in the portfolio.  #test if required again
 - Be conservative when uncertain; defer to human judgment.
 
 OUTPUT FORMAT:

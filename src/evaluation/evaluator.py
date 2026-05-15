@@ -47,10 +47,12 @@ class RedTeamEvaluator:
         input_blocked = False
         input_flags: list[str] = []
         defense_names_triggered: list[str] = []
+        max_defense_confidence: float = 0.0
 
         for defense in self.defenses:
             result = defense.check_input(user_query, context=injected_context)
             input_flags.extend(result.flags)
+            max_defense_confidence = max(max_defense_confidence, result.confidence)
             if not result.allowed:
                 input_blocked = True
                 defense_names_triggered.append(defense.name)
@@ -63,6 +65,7 @@ class RedTeamEvaluator:
                 agent_output="[BLOCKED BY INPUT DEFENSE]",
                 reasoning_chain=[f"Input blocked by: {', '.join(defense_names_triggered)}"],
                 detected_by_defense=True,
+                defense_confidence=max_defense_confidence,
                 financial_impact_estimate=0.0,
                 notes=f"Input flags: {input_flags}",
             )
@@ -88,6 +91,7 @@ class RedTeamEvaluator:
         for defense in self.defenses:
             result = defense.check_output(agent_output)
             output_flags.extend(result.flags)
+            max_defense_confidence = max(max_defense_confidence, result.confidence)
             if not result.allowed:
                 output_blocked = True
                 defense_names_triggered.append(defense.name)
@@ -96,6 +100,7 @@ class RedTeamEvaluator:
         attack_result = attack.evaluate(agent_output)
 
         # Override detection flag if defenses caught it
+        attack_result.defense_confidence = max_defense_confidence
         if output_blocked or input_blocked:
             attack_result.detected_by_defense = True
 
@@ -133,6 +138,7 @@ class RedTeamEvaluator:
                 "success": result.success,
                 "target_action_achieved": result.target_action_achieved,
                 "detected": result.detected_by_defense,
+                "defense_confidence": result.defense_confidence,
                 "financial_impact": result.financial_impact_estimate,
                 "notes": result.notes,
             })

@@ -34,6 +34,9 @@ from src.defenses.human_in_loop import HumanInLoopDefense
 from src.defenses.input_filter import InputFilterDefense
 from src.defenses.multi_agent import MultiAgentDefense
 from src.defenses.output_validator import OutputValidatorDefense
+from src.defenses.semantic_filter import SemanticInputFilterDefense
+from src.defenses.perplexity_filter import PerplexityFilterDefense
+from src.defenses.ensemble_defense import EnsembleDefense
 from src.evaluation.evaluator import RedTeamEvaluator
 from src.evaluation.metrics import attack_success_rate, detection_rate, financial_impact_summary
 from src.utils.llm import LLMClient
@@ -46,6 +49,8 @@ DEFENSE_MAP = {
     "guardrails": GuardrailsDefense,
     "human_in_loop": HumanInLoopDefense,
     "multi_agent": MultiAgentDefense,
+    "semantic_filter": SemanticInputFilterDefense,
+    "perplexity_filter": PerplexityFilterDefense,
 }
 
 
