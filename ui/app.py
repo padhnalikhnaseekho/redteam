@@ -202,6 +202,158 @@ def render_shell() -> None:
           font-size: .84rem;
           line-height: 1.35;
         }
+        .crt-journey {
+          border: 1px solid #cbd5e1;
+          border-radius: 8px;
+          background:
+            linear-gradient(135deg, rgba(11, 18, 32, .96), rgba(15, 23, 42, .92)),
+            linear-gradient(90deg, rgba(20, 184, 166, .16), rgba(245, 158, 11, .14));
+          color: #e5eef7;
+          padding: 1rem;
+          margin: .2rem 0 1.2rem 0;
+          box-shadow: 0 18px 44px rgba(15, 23, 42, .16);
+        }
+        .crt-journey-head {
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          align-items: end;
+          margin-bottom: .9rem;
+        }
+        .crt-journey-kicker {
+          color: #5eead4;
+          font-size: .76rem;
+          font-weight: 850;
+          letter-spacing: .07em;
+          text-transform: uppercase;
+        }
+        .crt-journey-title {
+          color: #ffffff;
+          font-size: 1.38rem;
+          font-weight: 850;
+          margin-top: .15rem;
+        }
+        .crt-journey-copy {
+          color: #b9c6d6;
+          font-size: .9rem;
+          line-height: 1.45;
+          max-width: 760px;
+        }
+        .crt-journey-map {
+          display: grid;
+          grid-template-columns: 1fr .8fr 1.08fr 1fr;
+          gap: .72rem;
+          align-items: stretch;
+        }
+        .crt-journey-node {
+          position: relative;
+          border: 1px solid rgba(203, 213, 225, .22);
+          border-radius: 8px;
+          background: rgba(255, 255, 255, .075);
+          padding: .85rem;
+          min-height: 184px;
+          overflow: hidden;
+        }
+        .crt-journey-node::after {
+          content: "";
+          position: absolute;
+          right: -.48rem;
+          top: 50%;
+          width: .95rem;
+          height: .95rem;
+          border-top: 2px solid rgba(94, 234, 212, .78);
+          border-right: 2px solid rgba(94, 234, 212, .78);
+          transform: translateY(-50%) rotate(45deg);
+          background: #101a2b;
+        }
+        .crt-journey-node:last-child::after {
+          display: none;
+        }
+        .crt-node-label {
+          display: inline-flex;
+          align-items: center;
+          gap: .4rem;
+          color: #f8fafc;
+          font-weight: 850;
+          font-size: .96rem;
+          margin-bottom: .45rem;
+        }
+        .crt-node-chip {
+          border: 1px solid rgba(255, 255, 255, .22);
+          border-radius: 999px;
+          color: #cbd5e1;
+          font-size: .72rem;
+          font-weight: 800;
+          padding: .18rem .42rem;
+          background: rgba(255,255,255,.06);
+        }
+        .crt-node-copy {
+          color: #b9c6d6;
+          font-size: .82rem;
+          line-height: 1.38;
+          margin-bottom: .62rem;
+        }
+        .crt-prompt-stack {
+          display: grid;
+          gap: .38rem;
+        }
+        .crt-prompt-card {
+          border: 1px solid rgba(148, 163, 184, .28);
+          border-radius: 6px;
+          padding: .42rem .48rem;
+          background: rgba(15, 23, 42, .72);
+          color: #dbeafe;
+          font-size: .76rem;
+          line-height: 1.28;
+        }
+        .crt-prompt-card strong {
+          color: #fbbf24;
+        }
+        .crt-user-add {
+          border-color: rgba(94, 234, 212, .45);
+          background: rgba(20, 184, 166, .12);
+        }
+        .crt-lane {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: .45rem;
+          margin-top: .72rem;
+        }
+        .crt-lane-step {
+          border: 1px solid rgba(203, 213, 225, .20);
+          border-radius: 6px;
+          padding: .44rem;
+          color: #d6e2ef;
+          font-size: .74rem;
+          background: rgba(255,255,255,.055);
+        }
+        .crt-lane-step b {
+          display: block;
+          color: #ffffff;
+          font-size: .76rem;
+          margin-bottom: .16rem;
+        }
+        .crt-evidence-strip {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: .5rem;
+          margin-top: .8rem;
+        }
+        .crt-evidence-item {
+          border-left: 3px solid #14b8a6;
+          background: rgba(255, 255, 255, .07);
+          border-radius: 6px;
+          padding: .5rem .56rem;
+          color: #cbd5e1;
+          font-size: .76rem;
+          min-height: 64px;
+        }
+        .crt-evidence-item b {
+          display: block;
+          color: #ffffff;
+          font-size: .8rem;
+          margin-bottom: .15rem;
+        }
         .crt-tracker {
           border: 1px solid var(--crt-line);
           border-radius: 8px;
@@ -264,10 +416,17 @@ def render_shell() -> None:
         }
         @media (max-width: 1100px) {
           .crt-flow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+          .crt-journey-map { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .crt-journey-node::after { display: none; }
+          .crt-evidence-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         }
         @media (max-width: 720px) {
           .crt-flow { grid-template-columns: 1fr; }
           .crt-hero { padding: 1rem; }
+          .crt-journey-head { display: block; }
+          .crt-journey-map,
+          .crt-lane,
+          .crt-evidence-strip { grid-template-columns: 1fr; }
         }
         </style>
         """,
@@ -300,6 +459,71 @@ def render_flow() -> None:
         for num, title, copy in steps
     )
     st.markdown(f'<div class="crt-flow">{body}</div>', unsafe_allow_html=True)
+
+
+def render_task_journey_diagram() -> None:
+    st.markdown(
+        """
+        <section class="crt-journey">
+          <div class="crt-journey-head">
+            <div>
+              <div class="crt-journey-kicker">Transparent task journey</div>
+              <div class="crt-journey-title">From task kickoff to prompt-level evidence</div>
+            </div>
+            <div class="crt-journey-copy">
+              The console is an LLM model safety workspace. Vertex AI is the access path to the selected model,
+              while the product shows the task plan, injected prompts, defenses, and evaluator evidence as inspectable stages.
+            </div>
+          </div>
+          <div class="crt-journey-map">
+            <div class="crt-journey-node">
+              <div class="crt-node-label">Kickstart task <span class="crt-node-chip">Run Benchmark</span></div>
+              <div class="crt-node-copy">User selects model, attack family, defense stack, and run mode. The run plan is visible before submission.</div>
+              <div class="crt-lane">
+                <div class="crt-lane-step"><b>Scope</b>Model and attack IDs</div>
+                <div class="crt-lane-step"><b>Defend</b>Filters and guardrails</div>
+                <div class="crt-lane-step"><b>Launch</b>Firestore job created</div>
+              </div>
+            </div>
+            <div class="crt-journey-node">
+              <div class="crt-node-label">Navigate execution <span class="crt-node-chip">Live Status</span></div>
+              <div class="crt-node-copy">Cloud Tasks starts the worker. The tracker shows queued, started, running, evidence stored, and failure states.</div>
+              <div class="crt-lane">
+                <div class="crt-lane-step"><b>API</b>Validates task</div>
+                <div class="crt-lane-step"><b>Worker</b>Runs matrix</div>
+                <div class="crt-lane-step"><b>Artifacts</b>JSON, CSV, report</div>
+              </div>
+            </div>
+            <div class="crt-journey-node">
+              <div class="crt-node-label">Inspect prompts <span class="crt-node-chip">Not a black box</span></div>
+              <div class="crt-node-copy">Each attack can expose the prompt ingredients that reached the model-under-test through Vertex AI.</div>
+              <div class="crt-prompt-stack">
+                <div class="crt-prompt-card"><strong>System:</strong> trading safety policy, limits, approval rules</div>
+                <div class="crt-prompt-card"><strong>Attack:</strong> direct injection, tool manipulation, context poisoning</div>
+                <div class="crt-prompt-card"><strong>Defense:</strong> filtered input, hardened prompt, validator hints</div>
+                <div class="crt-prompt-card crt-user-add"><strong>User add-on:</strong> paste an extra probe and rerun on demand</div>
+              </div>
+            </div>
+            <div class="crt-journey-node">
+              <div class="crt-node-label">Compare outcomes <span class="crt-node-chip">Results Explorer</span></div>
+              <div class="crt-node-copy">Unsafe behavior, detector coverage, model variance, and defense regressions are reviewed next to the exact run configuration.</div>
+              <div class="crt-lane">
+                <div class="crt-lane-step"><b>Score</b>Bypass and misuse</div>
+                <div class="crt-lane-step"><b>Trace</b>Prompt to response</div>
+                <div class="crt-lane-step"><b>Extend</b>Add probes</div>
+              </div>
+            </div>
+          </div>
+          <div class="crt-evidence-strip">
+            <div class="crt-evidence-item"><b>Prompt drawer</b>Shows generated attack prompt, defense additions, and selected target model context.</div>
+            <div class="crt-evidence-item"><b>On-demand probes</b>Add a one-off prompt to the live attack path without changing the benchmark catalog.</div>
+            <div class="crt-evidence-item"><b>Catalog promotion</b>Promote useful probes into reusable attack cases after review.</div>
+            <div class="crt-evidence-item"><b>Audit trail</b>Persist model ID, prompt version, defenses, scores, and artifacts for replay.</div>
+          </div>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def render_run_explainer() -> None:
@@ -559,12 +783,12 @@ with hero_left:
             '<section class="crt-hero">'
             '<div class="crt-brand-row">'
             f'{render_logo_mark()}'
-            '<div><div class="crt-kicker">Vertex AI safety evaluation console</div>'
+            '<div><div class="crt-kicker">LLM model safety evaluation console</div>'
             '<h1 class="crt-title">CommodityRedTeam</h1></div>'
             '</div>'
             '<div class="crt-subtitle">Enterprise benchmark workspace for testing commodity-trading LLM agents '
             'against prompt attacks, tool manipulation, policy bypass, and defense regressions before models are trusted '
-            'in real workflows.</div>'
+            'in real workflows. Vertex AI is the model access layer for this version, not the product boundary.</div>'
             '<div class="crt-pill-row">'
             '<span class="crt-pill">Cloud Run</span>'
             '<span class="crt-pill">Vertex AI Model Garden</span>'
@@ -605,6 +829,7 @@ with metric_cols[4]:
 
 st.markdown('<div class="crt-section-title">How a demonstration run works</div>', unsafe_allow_html=True)
 render_flow()
+render_task_journey_diagram()
 
 overview_tab, run_tab, results_tab, live_tab, catalog_tab = st.tabs(
     ["Overview", "Run Benchmark", "Results Explorer", "Live Attack", "Catalog"]
@@ -825,6 +1050,23 @@ with live_tab:
         key="single_attack",
     )
     selected_defenses = st.multiselect("Defenses", defense_names, key="single_defenses")
+    with st.expander("Inspect selected attack prompt path", expanded=True):
+        st.caption("The live run can show the catalog attack prompt, defense-added system context, and any one-off probe appended for this test.")
+        st.json(
+            {
+                "attack_id": selected_attack["id"],
+                "category": selected_attack.get("category"),
+                "severity": selected_attack.get("severity"),
+                "description": selected_attack.get("description"),
+            }
+        )
+    additional_prompt = st.text_area(
+        "Additional on-demand probe",
+        value="",
+        height=140,
+        placeholder="Paste an extra prompt to append to this attack for a one-off live test.",
+        help="This is appended to the selected attack only for the live run. It does not change the benchmark catalog.",
+    )
     if st.button("Run Live Attack", width="stretch"):
         try:
             result = api_post(
@@ -833,8 +1075,28 @@ with live_tab:
                     "model": selected_model,
                     "attack_id": selected_attack["id"],
                     "defenses": selected_defenses,
+                    "additional_prompt": additional_prompt or None,
                 },
             )
+            st.success("Live attack completed.")
+            trace = result.get("prompt_trace", {})
+            with st.expander("Prompt trace sent through the model access layer", expanded=True):
+                trace_cols = st.columns(3)
+                trace_cols[0].metric("Model", trace.get("model", selected_model))
+                trace_cols[1].metric("Access layer", trace.get("model_access_layer", "-"))
+                trace_cols[2].metric("Additional probe", "Yes" if result.get("additional_prompt_applied") else "No")
+                st.markdown("##### User / attack prompt")
+                st.code(trace.get("user_query", ""), language="text")
+                if trace.get("final_context_before_user"):
+                    st.markdown("##### Injected context before user prompt")
+                    st.json(trace["final_context_before_user"])
+                if trace.get("defense_steps"):
+                    st.markdown("##### Defense prompt additions and flags")
+                    st.json(trace["defense_steps"])
+                if trace.get("tool_overrides"):
+                    st.markdown("##### Tool overrides")
+                    st.json(trace["tool_overrides"])
+            st.markdown("#### Evaluation result")
             st.json(result)
         except Exception as exc:
             st.error(f"Run failed: {exc}")

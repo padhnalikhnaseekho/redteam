@@ -2,7 +2,7 @@
 
 > Last updated: 2026-05-16  
 > Deployment: GCP Cloud Run + Vertex AI / Model Garden  
-> UI: https://redteam-demo-ui-69498195329.asia-south1.run.app/
+> UI: https://redteam-demo-ui-x3egbjk7ma-el.a.run.app/
 
 ## 1. What This Product Is
 
@@ -527,10 +527,50 @@ In Google Cloud Console:
 
 ## 8. Operational Runbook
 
+### Build And Deploy With Cloud Build
+
+Use `cloudbuild.deploy.yaml` when source changes need to go live on Cloud Run. It builds and pushes the UI, API, and worker images, then updates the existing Cloud Run services/job to the same immutable tag.
+
+Required build identity:
+
+```text
+redteam-demo-build@project-e0bbb103-9e5b-4402-866.iam.gserviceaccount.com
+```
+
+This service account needs Artifact Registry writer, Cloud Run admin, Service Account User, Logging writer, and object-viewer access to the Cloud Build source staging bucket.
+
+```bash
+TAG=prompt-trace-20260516
+
+gcloud builds submit \
+  --config cloudbuild.deploy.yaml \
+  --project=project-e0bbb103-9e5b-4402-866 \
+  --gcs-source-staging-dir=gs://project-e0bbb103-9e5b-4402-866-cloudbuild-source/source \
+  --substitutions=_REGION=asia-south1,_REPOSITORY=redteam-demo-containers,_TAG=$TAG
+```
+
+The pipeline updates:
+
+```text
+redteam-demo-api     -> redteam-api:$TAG
+redteam-demo-ui      -> redteam-ui:$TAG
+redteam-demo-worker  -> redteam-worker:$TAG
+```
+
+Use `cloudbuild.yaml` only when you want to build and push images without changing the deployed Cloud Run revisions.
+
+Latest validated deploy:
+
+```text
+build_id: 29418e16-d8ed-40a1-933e-eadbf41e084b
+tag: prompt-trace-20260516-193541
+status: SUCCESS
+```
+
 ### Confirm UI Is Up
 
 ```bash
-curl -I https://redteam-demo-ui-69498195329.asia-south1.run.app/
+curl -I https://redteam-demo-ui-x3egbjk7ma-el.a.run.app/
 ```
 
 Expected:
@@ -661,4 +701,3 @@ An enterprise-grade result should include:
 ```
 
 The historical `results/results_0329_1945/summary.csv` is a good target pattern because it compares multiple models and defenses across 50 attacks. The adaptive `auto_redteam_v3_*` folders are the next maturity level because they include attack evolution, reflections, and strategy memory.
-

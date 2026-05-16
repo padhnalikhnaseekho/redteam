@@ -36,6 +36,10 @@ locals {
       role   = "roles/iam.serviceAccountUser"
       member = "serviceAccount:${google_service_account.build.email}"
     }
+    build_logging_writer = {
+      role   = "roles/logging.logWriter"
+      member = "serviceAccount:${google_service_account.build.email}"
+    }
   }
 }
 

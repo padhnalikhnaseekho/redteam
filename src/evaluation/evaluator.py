@@ -29,7 +29,7 @@ class RedTeamEvaluator:
         self.defenses = defenses or []
         self.results: list[dict[str, Any]] = []
 
-    def run_single(self, attack: Attack) -> AttackResult:
+    def run_single(self, attack: Attack, prepared_payload: dict[str, Any] | None = None) -> AttackResult:
         """Run a single attack against the agent.
 
         Steps:
@@ -41,7 +41,7 @@ class RedTeamEvaluator:
             6. Return AttackResult
         """
         # 1. Prepare attack payload
-        payload = attack.prepare(self.agent)
+        payload = prepared_payload or attack.prepare(self.agent)
         user_query = payload.get("user_query", "")
         tool_overrides = payload.get("tool_overrides", {})
         injected_context = payload.get("injected_context", [])

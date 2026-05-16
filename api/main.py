@@ -14,6 +14,7 @@ from google.cloud import firestore, storage, tasks_v2
 from pydantic import BaseModel, Field
 
 from src.agent.system_prompt import DEFAULT_SYSTEM_PROMPT
+from src.attacks.base import Attack, AttackResult
 from src.attacks.registry import get_all_attacks
 from src.defenses.base import Defense
 from src.defenses.guardrails import GuardrailsDefense
@@ -44,6 +45,7 @@ class SingleRunRequest(BaseModel):
     model: str = Field(default="vertex-gemini-flash")
     attack_id: str
     defenses: list[str] = Field(default_factory=list)
+    additional_prompt: str | None = Field(default=None, max_length=8000)
 
 
 class BenchmarkJobRequest(BaseModel):
@@ -153,7 +155,93 @@ def _build_agent(model_name: str, client: LLMClient):
         return response["content"]
 
     agent_fn.run = lambda query, context=None: agent_fn(query, context)
+    agent_fn.system_prompt = DEFAULT_SYSTEM_PROMPT
     return agent_fn
+
+
+class PromptAugmentedAttack(Attack):
+    """Wrap a catalog attack with a one-off user probe for live testing."""
+
+    def __init__(self, base_attack: Attack, additional_prompt: str) -> None:
+        self.base_attack = base_attack
+        self.additional_prompt = additional_prompt.strip()
+        super().__init__(
+            id=base_attack.id,
+            name=f"{base_attack.name} + live probe",
+            category=base_attack.category,
+            severity=base_attack.severity,
+            description=base_attack.description,
+            target_action=base_attack.target_action,
+            commodity=base_attack.commodity,
+        )
+
+    def prepare(self, agent) -> dict:
+        payload = dict(self.base_attack.prepare(agent))
+        base_query = str(payload.get("user_query", ""))
+        payload["user_query"] = f"{base_query}\n\nADDITIONAL USER PROBE:\n{self.additional_prompt}"
+        return payload
+
+    def evaluate(self, agent_result) -> AttackResult:
+        result = self.base_attack.evaluate(agent_result)
+        result.notes = f"{result.notes} | Live additional prompt applied".strip()
+        return result
+
+
+def _build_prompt_trace(
+    *,
+    agent: Any,
+    payload: dict[str, Any],
+    defenses: list[Defense],
+    model: str,
+    attack_id: str,
+) -> dict[str, Any]:
+    user_query = str(payload.get("user_query", ""))
+    injected_context = list(payload.get("injected_context", []))
+    tool_overrides = payload.get("tool_overrides", {})
+    defense_steps: list[dict[str, Any]] = []
+    final_context = list(injected_context)
+
+    for defense in defenses:
+        result = defense.check_input(user_query, context=injected_context)
+        step: dict[str, Any] = {
+            "defense": defense.name,
+            "allowed": result.allowed,
+            "flags": result.flags,
+            "confidence": result.confidence,
+        }
+        if result.modified_input:
+            original_prompt = getattr(agent, "system_prompt", DEFAULT_SYSTEM_PROMPT)
+            step["injected_system_prompt"] = result.modified_input.replace(
+                "{ORIGINAL_SYSTEM_PROMPT}",
+                str(original_prompt),
+            )
+        defense_steps.append(step)
+
+    prompt_overrides = [
+        step["injected_system_prompt"]
+        for step in defense_steps
+        if step.get("injected_system_prompt")
+    ]
+    if prompt_overrides:
+        final_context = [
+            {
+                "role": "system",
+                "content": "\n\n".join(prompt_overrides),
+            },
+            *final_context,
+        ]
+
+    return {
+        "model": model,
+        "model_access_layer": "Vertex AI" if model.startswith("vertex-") else "Direct provider client",
+        "attack_id": attack_id,
+        "base_system_prompt": getattr(agent, "system_prompt", DEFAULT_SYSTEM_PROMPT),
+        "user_query": user_query,
+        "injected_context": injected_context,
+        "defense_steps": defense_steps,
+        "final_context_before_user": final_context,
+        "tool_overrides": tool_overrides,
+    }
 
 
 def _queue_path() -> str:
@@ -266,21 +354,37 @@ def defenses() -> dict[str, list[str]]:
 
 @app.post("/run/single")
 def run_single(request: SingleRunRequest) -> dict[str, Any]:
-    attack = _attack_index().get(request.attack_id)
-    if attack is None:
+    base_attack = _attack_index().get(request.attack_id)
+    if base_attack is None:
         raise HTTPException(status_code=404, detail=f"Unknown attack: {request.attack_id}")
+    attack = (
+        PromptAugmentedAttack(base_attack, request.additional_prompt)
+        if request.additional_prompt and request.additional_prompt.strip()
+        else base_attack
+    )
 
     agent = _build_agent(request.model, LLMClient())
+    defenses = _build_defenses(request.defenses)
+    prepared_payload = attack.prepare(agent)
+    prompt_trace = _build_prompt_trace(
+        agent=agent,
+        payload=prepared_payload,
+        defenses=defenses,
+        model=request.model,
+        attack_id=request.attack_id,
+    )
     evaluator = RedTeamEvaluator(
         agent=agent,
         attacks=[attack],
-        defenses=_build_defenses(request.defenses),
+        defenses=defenses,
     )
-    result = evaluator.run_single(attack)
+    result = evaluator.run_single(attack, prepared_payload=prepared_payload)
     return {
         "model": request.model,
         "attack_id": request.attack_id,
         "defenses": request.defenses,
+        "additional_prompt_applied": bool(request.additional_prompt and request.additional_prompt.strip()),
+        "prompt_trace": prompt_trace,
         "success": result.success,
         "target_action_achieved": result.target_action_achieved,
         "detected_by_defense": result.detected_by_defense,
