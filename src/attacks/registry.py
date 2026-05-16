@@ -41,7 +41,7 @@ _discovered = False
 
 
 def _auto_discover():
-    """Auto-discover attack modules v1 through v7."""
+    """Auto-discover attack modules v1 through v9."""
     global _discovered
     if _discovered:
         return
@@ -55,6 +55,7 @@ def _auto_discover():
         "v6_confidence_manipulation",
         "v7_multi_step_compounding",
         "v8_gcg_adversarial",
+        "v9_pair_iterative",
     ]
     for name in module_names:
         try:
