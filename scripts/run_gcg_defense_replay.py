@@ -119,9 +119,22 @@ def build_defenses(name: str) -> list[Defense]:
     raise ValueError(f"Unknown defense config: {name!r}")
 
 
-def build_agent(model_name: str):
-    """Wrap LLMClient.chat as a callable agent with a .run() method."""
+def build_agent(model_name: str, temperature: float | None = None):
+    """Wrap LLMClient.chat as a callable agent with a .run() method.
+
+    Optionally overrides the model's per-call temperature. n_trials > 1
+    runs in §5.6.10 pass temperature=0.7 so retries draw different samples
+    from the API; the config-default of 0.3 produces near-deterministic
+    completions which would give us trivial variance.
+    """
     client = LLMClient()
+    if temperature is not None:
+        # Mutate this client's cached config so subsequent _chat_<provider>
+        # calls read the override. Each agent owns its own LLMClient, so
+        # this does not leak across (model, defense) cells.
+        cfg = dict(client._config.get(model_name, {}))
+        cfg["temperature"] = temperature
+        client._config[model_name] = cfg
 
     def agent_fn(query: str, context: list[dict] | None = None) -> str:
         messages = [{"role": "system", "content": DEFAULT_SYSTEM_PROMPT}]
@@ -161,6 +174,18 @@ def main() -> None:
         ),
     )
     parser.add_argument("--out", default="results/gcg_defense_replay.json")
+    parser.add_argument(
+        "--n-trials", type=int, default=1,
+        help=(
+            "Repeat each (attack, model) cell N times to reduce evaluation "
+            "variance. Default 1 (legacy behaviour). When >1, agent temperature "
+            "is forced to --temperature."
+        ),
+    )
+    parser.add_argument(
+        "--temperature", type=float, default=0.7,
+        help="Agent temperature when --n-trials > 1. Ignored at n_trials=1.",
+    )
     args = parser.parse_args()
 
     attacks = get_attacks(category=AttackCategory.V8_GCG_ADVERSARIAL)
@@ -181,14 +206,25 @@ def main() -> None:
         for model_name in args.models:
             console.print(f"  [cyan]Model:[/cyan] {model_name}")
             try:
-                agent = build_agent(model_name)
-                evaluator = RedTeamEvaluator(agent=agent, attacks=attacks, defenses=defenses)
-                evaluator.run_suite(model=model_name)
-                rows = evaluator.results
-                all_results.extend(rows)
-                asr = sum(r["success"] for r in rows) / len(rows) * 100 if rows else 0
-                det = sum(r["detected"] for r in rows) / len(rows) * 100 if rows else 0
-                console.print(f"    ASR: {asr:.0f}%   Detected: {det:.0f}%   ({len(rows)} attacks)")
+                temp = args.temperature if args.n_trials > 1 else None
+                cell_rows: list[dict] = []
+                for trial in range(args.n_trials):
+                    agent = build_agent(model_name, temperature=temp)
+                    evaluator = RedTeamEvaluator(agent=agent, attacks=attacks, defenses=defenses)
+                    evaluator.run_suite(model=model_name)
+                    # Stamp the trial index so downstream aggregation can
+                    # compute proper per-cell ASR / CI rather than treating
+                    # repeated trials as if they were distinct attacks.
+                    for r in evaluator.results:
+                        r["trial"] = trial
+                    cell_rows.extend(evaluator.results)
+                all_results.extend(cell_rows)
+                asr = sum(r["success"] for r in cell_rows) / len(cell_rows) * 100 if cell_rows else 0
+                det = sum(r["detected"] for r in cell_rows) / len(cell_rows) * 100 if cell_rows else 0
+                console.print(
+                    f"    ASR: {asr:.0f}%   Detected: {det:.0f}%   "
+                    f"({len(cell_rows)} rows = {args.n_trials} trial(s) × {len(attacks)} attacks)"
+                )
             except Exception as exc:
                 console.print(f"    [red]Run failed: {exc}[/red]")
 
