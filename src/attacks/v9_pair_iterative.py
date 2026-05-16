@@ -35,6 +35,9 @@ Operational notes:
       `results/pair_attack_cache.json` keyed by (goal_key, target_model).
       Re-running the suite uses cached prompts without re-querying the
       attacker LLM.
+    - Set `PAIR_CACHE_URI=gs://bucket/path/pair_attack_cache.json` to back
+      the cache by Google Cloud Storage instead of the local file (used
+      by the Cloud Run worker, whose local `results/` dir is ephemeral).
     - Attacker and judge both default to `groq-llama` (Llama-3.3-70B on
       Groq's free tier — best instruction-following among free models).
       Override via PAIRRunner constructor for ablation studies.
@@ -205,15 +208,71 @@ class PAIRRunner:
             logger.info("PAIR: LLMClient unavailable (%s) — offline fallback", exc)
             return None
 
+    def _resolve_cache_location(self) -> tuple[str, str | Path]:
+        """Decide whether the cache lives on GCS or the local filesystem.
+
+        Resolution rule:
+          - If env var ``PAIR_CACHE_URI`` is set and starts with ``gs://``,
+            use that URI (Cloud Run worker path).
+          - Otherwise, fall back to ``PAIRConfig.cache_path`` (laptop path).
+
+        Returns:
+            (kind, location) where kind is ``"gcs"`` or ``"local"`` and
+            location is the URI string or local ``Path`` respectively.
+        """
+        env_uri = os.environ.get("PAIR_CACHE_URI", "")
+        if env_uri.startswith("gs://"):
+            return "gcs", env_uri
+        return "local", self._config.cache_path
+
+    @staticmethod
+    def _parse_gs_uri(uri: str) -> tuple[str, str]:
+        """Split ``gs://bucket/object/path`` into ``(bucket, object_path)``."""
+        without_scheme = uri[len("gs://"):]
+        bucket, _, blob = without_scheme.partition("/")
+        if not bucket or not blob:
+            raise ValueError(f"Malformed GCS URI: {uri!r}")
+        return bucket, blob
+
     def _load_cache(self) -> None:
-        path = self._config.cache_path
+        kind, location = self._resolve_cache_location()
+        if kind == "gcs":
+            # Lazy import: `google-cloud-storage` is a Cloud Run dependency,
+            # not required on laptops. Mirrors the lazy LLMClient import.
+            from google.cloud import storage  # type: ignore[import-not-found]
+
+            bucket_name, blob_name = self._parse_gs_uri(location)
+            client = storage.Client()
+            blob = client.bucket(bucket_name).blob(blob_name)
+            if blob.exists():
+                self._cache = json.loads(blob.download_as_text())
+                logger.info(
+                    "PAIR: loaded %d cached prompts from %s",
+                    len(self._cache), location,
+                )
+            return
+
+        path = location
         if path.exists():
             with open(path) as f:
                 self._cache = json.load(f)
             logger.info("PAIR: loaded %d cached prompts from %s", len(self._cache), path)
 
     def _save_cache(self) -> None:
-        path = self._config.cache_path
+        kind, location = self._resolve_cache_location()
+        if kind == "gcs":
+            from google.cloud import storage  # type: ignore[import-not-found]
+
+            bucket_name, blob_name = self._parse_gs_uri(location)
+            client = storage.Client()
+            blob = client.bucket(bucket_name).blob(blob_name)
+            blob.upload_from_string(
+                json.dumps(self._cache, indent=2),
+                content_type="application/json",
+            )
+            return
+
+        path = location
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w") as f:
             json.dump(self._cache, f, indent=2)

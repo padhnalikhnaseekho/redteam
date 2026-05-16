@@ -197,6 +197,96 @@ class TestV9PAIR:
         out = attack.evaluate("Trade processed with risk_check: bypassed.")
         assert out.success is True
 
+    def test_cache_path_local_default(self, tmp_path, monkeypatch):
+        """Without PAIR_CACHE_URI, _save_cache writes to the configured local file."""
+        import json
+        from src.attacks.v9_pair_iterative import PAIRConfig, PAIRRunner
+
+        # Ensure no GCS URI is configured and force offline mode so the
+        # runner does not attempt real LLM calls during construction.
+        monkeypatch.delenv("PAIR_CACHE_URI", raising=False)
+        monkeypatch.setattr(PAIRRunner, "_maybe_load_llm", staticmethod(lambda: None))
+
+        cache_file = tmp_path / "cache.json"
+        runner = PAIRRunner(PAIRConfig(cache_path=cache_file))
+
+        # Sanity: resolution returns the local path.
+        kind, location = runner._resolve_cache_location()
+        assert kind == "local"
+        assert location == cache_file
+
+        # Inject a fake cache entry and persist it.
+        runner._cache["risk_bypass/test-target"] = {
+            "best_prompt": "test prompt",
+            "best_score": 9,
+            "iterations": 1,
+        }
+        runner._save_cache()
+
+        assert cache_file.exists()
+        loaded = json.loads(cache_file.read_text())
+        assert loaded["risk_bypass/test-target"]["best_prompt"] == "test prompt"
+        assert loaded["risk_bypass/test-target"]["best_score"] == 9
+
+    def test_cache_path_gcs_uri(self, monkeypatch):
+        """With PAIR_CACHE_URI=gs://..., cache load/save go through google.cloud.storage."""
+        import json
+        import sys
+        import types
+        from unittest.mock import MagicMock
+
+        from src.attacks.v9_pair_iterative import PAIRConfig, PAIRRunner
+
+        monkeypatch.setenv("PAIR_CACHE_URI", "gs://fake-bucket/pair.json")
+        monkeypatch.setattr(PAIRRunner, "_maybe_load_llm", staticmethod(lambda: None))
+
+        # Build a fake `google.cloud.storage` module so the lazy import
+        # inside _load_cache / _save_cache resolves to our MagicMock without
+        # requiring the real google-cloud-storage package to be installed.
+        mock_blob = MagicMock()
+        mock_bucket = MagicMock()
+        mock_bucket.blob.return_value = mock_blob
+        mock_client = MagicMock()
+        mock_client.bucket.return_value = mock_bucket
+
+        fake_storage = types.ModuleType("google.cloud.storage")
+        fake_storage.Client = MagicMock(return_value=mock_client)
+        fake_google = sys.modules.get("google") or types.ModuleType("google")
+        fake_cloud = sys.modules.get("google.cloud") or types.ModuleType("google.cloud")
+        monkeypatch.setitem(sys.modules, "google", fake_google)
+        monkeypatch.setitem(sys.modules, "google.cloud", fake_cloud)
+        monkeypatch.setitem(sys.modules, "google.cloud.storage", fake_storage)
+        monkeypatch.setattr(fake_cloud, "storage", fake_storage, raising=False)
+
+        runner = PAIRRunner(PAIRConfig())
+
+        # Resolution returns the GCS branch.
+        kind, location = runner._resolve_cache_location()
+        assert kind == "gcs"
+        assert location == "gs://fake-bucket/pair.json"
+
+        # ---- _save_cache: should call upload_from_string with valid JSON ----
+        runner._cache["risk_bypass/groq-llama"] = {"best_prompt": "x", "best_score": 7}
+        runner._save_cache()
+
+        fake_storage.Client.assert_called()
+        mock_client.bucket.assert_called_with("fake-bucket")
+        mock_bucket.blob.assert_called_with("pair.json")
+        assert mock_blob.upload_from_string.call_count == 1
+        uploaded_payload = mock_blob.upload_from_string.call_args.args[0]
+        parsed = json.loads(uploaded_payload)
+        assert parsed["risk_bypass/groq-llama"]["best_prompt"] == "x"
+
+        # ---- _load_cache: download_as_text returns a small JSON ----
+        mock_blob.exists.return_value = True
+        mock_blob.download_as_text.return_value = json.dumps(
+            {"trade_execution/groq-qwen": {"best_prompt": "y", "best_score": 8}}
+        )
+        runner._cache = {}
+        runner._load_cache()
+        assert "trade_execution/groq-qwen" in runner._cache
+        assert runner._cache["trade_execution/groq-qwen"]["best_prompt"] == "y"
+
 
 class TestAttackFiltering:
     """Test the filtering functionality of the registry."""
