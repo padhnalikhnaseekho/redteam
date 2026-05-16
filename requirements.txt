@@ -5,6 +5,16 @@ google-genai>=1.0.0
 groq>=0.4.0
 openai>=1.12.0
 
+# Cloud Run services
+fastapi>=0.110.0
+uvicorn[standard]>=0.27.0
+streamlit>=1.31.0
+requests>=2.31.0
+google-cloud-firestore>=2.15.0
+google-cloud-storage>=2.14.0
+google-cloud-run>=0.10.0
+google-cloud-tasks>=2.16.0
+
 # LangChain
 langchain>=0.1.0
 langchain-anthropic>=0.1.0

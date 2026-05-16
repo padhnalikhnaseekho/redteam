@@ -38,3 +38,16 @@ This project should demonstrate depth in:
 - **Module 2**: Embeddings (semantic similarity defense), transfer learning (attack transferability), ensemble methods (ensemble defense combining multiple signals), few-shot prompting
 - **Module 3**: Agentic AI (LangChain agent with tools)
 - **Module 4**: Model evaluation (Bayesian analysis, MI, ROC), explainability (SHAP for attack success prediction)
+
+<!-- SDD-PRIORITY -->
+## SDD Priority (when enabled)
+
+This repo has SDD (Spec-Driven Development) enabled. For ALL code changes:
+
+- **Use SDD agents** (feature-planner -> spec-writer -> spec-driven-developer -> code-review-specialist)
+- **Do NOT use** other commands or skills (e.g., custom slash commands) for code-changing work when SDD is enabled
+- Other commands and skills remain available for **read-only tasks** or tasks that do not modify source code
+- The spec gate **will block** any Write/Edit to source files without a SPEC-APPROVED feature file
+
+If you are unsure whether a task requires SDD, check: does it modify files under the source root or protected paths? If yes, use the SDD pipeline.
+<!-- /SDD-PRIORITY -->

@@ -6,6 +6,21 @@ A research framework for systematically identifying and evaluating vulnerabiliti
 
 ---
 
+## Cloud Run Product Guide
+
+The deployed GCP product architecture, UI walkthrough, demo flows, result interpretation, Model Garden enablement checklist, and improvement roadmap are documented here:
+
+- [Cloud Run Product User Guide](docs/cloudrun-product-user-guide.md)
+- [Vertex AI + Cloud Run Implementation Plan](specs/cloud/GCP-VERTEXAI-CLOUDRUN-IMPLEMENTATION-PLAN.md)
+
+Current deployed UI:
+
+```text
+https://redteam-demo-ui-69498195329.asia-south1.run.app/
+```
+
+---
+
 ## Project Structure
 
 ```

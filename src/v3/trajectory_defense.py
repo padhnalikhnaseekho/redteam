@@ -83,6 +83,7 @@ class TrajectoryDefense(Defense):
         self.escalation_threshold = escalation_threshold
         self.drift_threshold = drift_threshold
         self.injection_threshold = injection_threshold
+        self._trajectory_buffer: list[dict[str, Any]] = []
 
     def detect(self, trajectory: list[dict[str, Any]]) -> DefenseResult:
         """Analyze a full trajectory for adversarial patterns.
@@ -122,10 +123,6 @@ class TrajectoryDefense(Defense):
                 confidence=round(confidence, 3),
             )
         return DefenseResult(allowed=True, confidence=1.0)
-
-    # Also expose as check_input for compatibility with the Defense base class.
-    # When used as a per-step defense, it accumulates trajectory internally.
-    _trajectory_buffer: list[dict[str, Any]] = []
 
     def check_input(
         self,

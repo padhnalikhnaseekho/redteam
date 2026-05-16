@@ -1,4 +1,59 @@
 models:
+  # --- GCP Vertex AI / Model Garden models (preferred for Cloud Run) ---
+
+  vertex-gemini-flash:
+    provider: "vertex"
+    family: "gemini"
+    project_id_env: "GOOGLE_CLOUD_PROJECT"
+    location: "us-central1"
+    model_id: "gemini-2.5-flash"
+    max_tokens: 4096
+    temperature: 0.3
+    role: "reviewer"
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+  vertex-gemini-pro:
+    provider: "vertex"
+    family: "gemini"
+    project_id_env: "GOOGLE_CLOUD_PROJECT"
+    location: "us-central1"
+    model_id: "gemini-2.5-pro"
+    max_tokens: 4096
+    temperature: 0.2
+    role: "target_agent"
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+  # Partner models require accepting the Model Garden terms/model card in
+  # the GCP project before first use. The code path uses Vertex publisher
+  # model endpoints with Application Default Credentials, not provider keys.
+  vertex-claude-sonnet:
+    provider: "vertex"
+    family: "claude"
+    project_id_env: "GOOGLE_CLOUD_PROJECT"
+    location: "us-east5"
+    model_id: "claude-sonnet-4-6"
+    max_tokens: 4096
+    temperature: 0.3
+    role: "comparison_target"
+    requires_model_garden_enablement: true
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
+  vertex-mistral-medium:
+    provider: "vertex"
+    family: "mistral"
+    project_id_env: "GOOGLE_CLOUD_PROJECT"
+    location: "us-central1"
+    model_id: "mistral-medium-3"
+    max_tokens: 4096
+    temperature: 0.3
+    role: "comparison_target"
+    requires_model_garden_enablement: true
+    cost_per_1k_input_tokens: 0.0
+    cost_per_1k_output_tokens: 0.0
+
   # --- Primary models (have API keys) ---
 
   claude-sonnet:
