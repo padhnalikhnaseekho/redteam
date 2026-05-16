@@ -1,0 +1,28 @@
+# Worker service runtime for the v1 benchmark path.
+pyyaml>=6.0
+pydantic>=2.0
+pandas>=2.0
+numpy>=1.24
+rich>=13.0
+python-dotenv>=1.0
+langchain-core>=0.1.0
+yfinance>=0.2.30
+
+# LLM providers used by benchmark models.
+google-genai>=1.0.0
+anthropic>=0.18.0
+mistralai>=0.1.0
+groq>=0.4.0
+openai>=1.12.0
+
+# GCP service integrations.
+google-cloud-firestore>=2.15.0
+google-cloud-storage>=2.14.0
+
+# Heavy local defenses. These are lazy-loaded only when semantic_filter or
+# perplexity_filter is selected, but must exist in the worker image for full
+# service-spec coverage.
+sentence-transformers>=2.2.0
+scikit-learn>=1.3
+torch>=2.0
+transformers>=4.30

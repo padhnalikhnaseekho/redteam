@@ -606,7 +606,7 @@ Update `src/agent/trading_agent.py`:
 
 - Add Vertex-backed target-agent support.
 - Prefer Gemini Vertex first because the repo already uses `google-genai`.
-- Add `langchain-google-vertexai` when LangChain tool-calling is required.
+- Use `langchain-google-genai` for LangChain Gemini tool-calling through `ChatGoogleGenerativeAI(vertexai=True)`.
 - Keep direct provider LangChain classes as optional fallback.
 
 ### 11.4 API Wrapper

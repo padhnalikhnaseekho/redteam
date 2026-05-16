@@ -14,7 +14,7 @@ status: CURRENT
 
 ## Purpose
 
-Unified wrapper around 5 LLM provider APIs. Provides cost tracking, per-call latency measurement, normalized response format, and a 120-second timeout mechanism. Used by all V3 agents, defenses, and the generator — but NOT by `CommodityTradingAgent` (which uses LangChain providers directly).
+Unified wrapper around direct LLM provider APIs plus Vertex AI Gemini. Provides cost tracking, per-call latency measurement, normalized response format, and a 120-second timeout mechanism. Used by all V3 agents, defenses, and the generator. `CommodityTradingAgent` still uses LangChain providers directly, but can now resolve Vertex-backed Gemini model keys for target-agent runs.
 
 ---
 
@@ -54,6 +54,7 @@ response = client.chat(
 | `mistral` | `mistralai.client.Mistral` | Standard `{role, content}` | Yes |
 | `google` | `google.genai.Client` | System extracted; `types.Content` objects | No (returns `tool_calls: None`) |
 | `groq` | `groq.Groq` | OpenAI-compatible | Yes |
+| `vertex` | `google.genai.Client(vertexai=True, project=..., location=...)` | System extracted; `types.Content` objects | No in `LLMClient`; use `CommodityTradingAgent` for LangChain tool-calling |
 
 **Anthropic tool conversion:** `_convert_tools_to_anthropic()` converts OpenAI-format tool dicts to Anthropic format (`{name, description, input_schema}`).
 
@@ -67,6 +68,8 @@ Models are defined in `config/models.yaml`:
 |---|---|---|---|
 | `claude-sonnet` | anthropic | claude-sonnet-4-20250514 | No ($0.003/$0.015 per 1K tokens) |
 | `mistral-large` | mistral | mistral-large-latest | No ($0.002/$0.006 per 1K tokens) |
+| `vertex-gemini-flash` | vertex | gemini-2.5-flash | Vertex billing |
+| `vertex-gemini-pro` | vertex | gemini-2.5-pro | Vertex billing |
 | `gemini-flash` | google | gemini-2.0-flash | Yes ($0.0) |
 | `groq-llama` | groq | llama-3.3-70b-versatile | Yes ($0.0) |
 | `groq-qwen` | groq | qwen/qwen3-32b | Yes ($0.0) |
@@ -108,18 +111,22 @@ If the provider takes longer than `timeout` seconds, `concurrent.futures.Timeout
 
 ## Secret Management
 
-Keys are read at first provider use (lazy initialization):
+Direct provider keys are read at first provider use (lazy initialization):
 ```python
 client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
 ```
 
 `os.environ["KEY"]` raises `KeyError` if missing (not `.get()`). `load_dotenv()` is called at module import time (`src/utils/llm.py` module level).
 
+Vertex models do not use provider API keys. They use Application Default Credentials and require a GCP project from `GOOGLE_CLOUD_PROJECT` unless `project_id` is set on the model config. Each Vertex model entry must define `location`.
+
 ---
 
 ## Limitations
 
 - Google provider does not support tool calling via `LLMClient`
+- Vertex Gemini provider does not support tool calling via `LLMClient`
+- Vertex partner model adapters are not implemented yet; only `family: gemini` is supported
 - No retry logic for rate limits or transient errors
 - No request batching — calls are always sequential
 - Token counts from Google use `usage_metadata` attribute which may be 0 if provider doesn't populate it

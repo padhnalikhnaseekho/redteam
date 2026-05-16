@@ -40,9 +40,17 @@ class LLMClient:
     # Client initialisation (lazy)
     # ------------------------------------------------------------------
 
-    def _get_client(self, provider: str) -> Any:
-        if provider in self._clients:
-            return self._clients[provider]
+    def _get_client(self, provider: str, cfg: dict[str, Any] | None = None) -> Any:
+        cache_key = provider
+        if provider == "vertex":
+            project = self._vertex_project(cfg or {})
+            location = (cfg or {}).get("location")
+            if not location:
+                raise ValueError("Vertex model config must define a 'location'.")
+            cache_key = f"vertex:{project}:{location}"
+
+        if cache_key in self._clients:
+            return self._clients[cache_key]
 
         if provider == "openai":
             from openai import OpenAI
@@ -59,10 +67,17 @@ class LLMClient:
         elif provider == "groq":
             from groq import Groq
             client = Groq(api_key=os.environ["GROQ_API_KEY"])
+        elif provider == "vertex":
+            from google import genai
+            client = genai.Client(
+                vertexai=True,
+                project=project,
+                location=location,
+            )
         else:
             raise ValueError(f"Unknown provider: {provider}")
 
-        self._clients[provider] = client
+        self._clients[cache_key] = client
         return client
 
     def _model_cfg(self, model_name: str) -> dict[str, Any]:
@@ -106,7 +121,7 @@ class LLMClient:
         """
         cfg = self._model_cfg(model_name)
         provider = cfg["provider"]
-        client = self._get_client(provider)
+        client = self._get_client(provider, cfg)
 
         t0 = time.time()
 
@@ -122,6 +137,8 @@ class LLMClient:
                 return self._chat_google(client, cfg, messages, tools)
             elif provider == "groq":
                 return self._chat_groq(client, cfg, messages, tools)
+            elif provider == "vertex":
+                return self._chat_vertex(client, cfg, messages, tools)
             else:
                 raise ValueError(f"Unknown provider: {provider}")
 
@@ -333,6 +350,123 @@ class LLMClient:
             "output_tokens": output_tokens,
         }
 
+    def _chat_vertex(
+        self,
+        client: Any,
+        cfg: dict,
+        messages: list[dict],
+        tools: list[dict] | None,
+    ) -> dict[str, Any]:
+        """Call Model Garden models through Vertex AI using ADC."""
+        family = cfg.get("family", "gemini")
+        if tools:
+            raise NotImplementedError(
+                "LLMClient Vertex tool calling is not implemented yet. "
+                "Use CommodityTradingAgent for LangChain tool-calling runs."
+            )
+        if family == "gemini":
+            return self._chat_google(client, cfg, messages, tools=None)
+        if family == "claude":
+            return self._chat_vertex_claude(cfg, messages)
+        if family == "mistral":
+            return self._chat_vertex_mistral(cfg, messages)
+        raise NotImplementedError(f"Unsupported Vertex Model Garden family: {family}")
+
+    def _vertex_authorized_session(self) -> Any:
+        import google.auth
+        from google.auth.transport.requests import AuthorizedSession
+
+        credentials, _ = google.auth.default(scopes=["https://www.googleapis.com/auth/cloud-platform"])
+        return AuthorizedSession(credentials)
+
+    def _vertex_raw_predict_url(self, cfg: dict[str, Any]) -> str:
+        project = self._vertex_project(cfg)
+        location = cfg["location"]
+        model_id = cfg["model_id"]
+        return (
+            f"https://{location}-aiplatform.googleapis.com/v1/"
+            f"projects/{project}/locations/{location}/publishers/"
+            f"{self._vertex_publisher(cfg)}/models/{model_id}:rawPredict"
+        )
+
+    @staticmethod
+    def _vertex_publisher(cfg: dict[str, Any]) -> str:
+        family = cfg.get("family", "")
+        if family == "claude":
+            return "anthropic"
+        if family == "mistral":
+            return "mistralai"
+        raise ValueError(f"No Vertex publisher mapping for family: {family}")
+
+    @staticmethod
+    def _split_system_messages(messages: list[dict]) -> tuple[str, list[dict]]:
+        system_text = "\n".join(m["content"] for m in messages if m.get("role") == "system")
+        chat_messages = [m for m in messages if m.get("role") != "system"]
+        return system_text, chat_messages
+
+    def _chat_vertex_claude(self, cfg: dict[str, Any], messages: list[dict]) -> dict[str, Any]:
+        system_text, chat_messages = self._split_system_messages(messages)
+        body: dict[str, Any] = {
+            "anthropic_version": "vertex-2023-10-16",
+            "messages": chat_messages,
+            "max_tokens": cfg["max_tokens"],
+            "temperature": cfg["temperature"],
+        }
+        if system_text.strip():
+            body["system"] = system_text.strip()
+
+        response = self._vertex_authorized_session().post(
+            self._vertex_raw_predict_url(cfg),
+            json=body,
+            timeout=180,
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(
+                "Vertex Claude call failed. Confirm the model is enabled in "
+                f"Model Garden and the location/model_id are valid: {response.text}"
+            )
+        payload = response.json()
+        content = payload.get("content", [])
+        text = "".join(block.get("text", "") for block in content if block.get("type") == "text")
+        usage = payload.get("usage", {})
+        return {
+            "content": text,
+            "tool_calls": None,
+            "input_tokens": int(usage.get("input_tokens", 0) or 0),
+            "output_tokens": int(usage.get("output_tokens", 0) or 0),
+        }
+
+    def _chat_vertex_mistral(self, cfg: dict[str, Any], messages: list[dict]) -> dict[str, Any]:
+        body = {
+            "model": cfg["model_id"],
+            "messages": messages,
+            "max_tokens": cfg["max_tokens"],
+            "temperature": cfg["temperature"],
+            "stream": False,
+        }
+        response = self._vertex_authorized_session().post(
+            self._vertex_raw_predict_url(cfg),
+            json=body,
+            timeout=180,
+        )
+        if response.status_code >= 400:
+            raise RuntimeError(
+                "Vertex Mistral call failed. Confirm the model is enabled in "
+                f"Model Garden and the location/model_id are valid: {response.text}"
+            )
+        payload = response.json()
+        choices = payload.get("choices", [])
+        content = ""
+        if choices:
+            content = choices[0].get("message", {}).get("content", "") or choices[0].get("text", "")
+        usage = payload.get("usage", {})
+        return {
+            "content": content,
+            "tool_calls": None,
+            "input_tokens": int(usage.get("prompt_tokens", 0) or 0),
+            "output_tokens": int(usage.get("completion_tokens", 0) or 0),
+        }
+
     def _chat_groq(
         self,
         client: Any,
@@ -399,6 +533,17 @@ class LLMClient:
         output_cost = (output_tokens / 1000) * cfg.get("cost_per_1k_output_tokens", 0)
         return round(input_cost + output_cost, 6)
 
+    @staticmethod
+    def _vertex_project(cfg: dict[str, Any]) -> str:
+        project_env = cfg.get("project_id_env", "GOOGLE_CLOUD_PROJECT")
+        project = cfg.get("project_id") or os.environ.get(project_env)
+        if not project:
+            raise EnvironmentError(
+                "Vertex model config requires a GCP project. Set "
+                f"{project_env} or add 'project_id' to the model config."
+            )
+        return project
+
     @property
     def total_cost(self) -> float:
         return round(sum(r.cost_usd for r in self.usage_log), 6)
@@ -412,3 +557,17 @@ class LLMClient:
 
     def available_models(self) -> list[str]:
         return list(self._config.keys())
+
+    def model_metadata(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "name": name,
+                "provider": cfg.get("provider"),
+                "family": cfg.get("family"),
+                "model_id": cfg.get("model_id"),
+                "location": cfg.get("location"),
+                "role": cfg.get("role"),
+                "requires_model_garden_enablement": bool(cfg.get("requires_model_garden_enablement")),
+            }
+            for name, cfg in self._config.items()
+        ]

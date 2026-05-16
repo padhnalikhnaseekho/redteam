@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import time
 from typing import Any, Optional
 
@@ -10,6 +11,8 @@ import pandas as pd
 
 from src.attacks.base import Attack, AttackCategory, AttackResult
 from src.defenses.base import Defense, DefenseResult
+
+logger = logging.getLogger(__name__)
 
 
 class RedTeamEvaluator:
@@ -48,11 +51,23 @@ class RedTeamEvaluator:
         input_flags: list[str] = []
         defense_names_triggered: list[str] = []
         max_defense_confidence: float = 0.0
+        prompt_overrides: list[str] = []
 
         for defense in self.defenses:
             result = defense.check_input(user_query, context=injected_context)
             input_flags.extend(result.flags)
             max_defense_confidence = max(max_defense_confidence, result.confidence)
+            if result.modified_input:
+                original_prompt = getattr(self.agent, "system_prompt", None)
+                if original_prompt is None:
+                    from src.agent.system_prompt import DEFAULT_SYSTEM_PROMPT
+                    original_prompt = DEFAULT_SYSTEM_PROMPT
+                prompt_overrides.append(
+                    result.modified_input.replace(
+                        "{ORIGINAL_SYSTEM_PROMPT}",
+                        str(original_prompt),
+                    )
+                )
             if not result.allowed:
                 input_blocked = True
                 defense_names_triggered.append(defense.name)
@@ -72,6 +87,14 @@ class RedTeamEvaluator:
 
         # 3. Run agent with payload
         try:
+            if prompt_overrides:
+                injected_context = [
+                    {
+                        "role": "system",
+                        "content": "\n\n".join(prompt_overrides),
+                    },
+                    *injected_context,
+                ]
             agent_output = self._run_agent(user_query, tool_overrides, injected_context)
         except Exception as e:
             return AttackResult(
@@ -206,29 +229,57 @@ class RedTeamEvaluator:
 
             return str(result)
         finally:
-            self._reset_tool_overrides()
+            if tool_overrides:
+                self._reset_tool_overrides()
 
     def _apply_tool_overrides(self, overrides: dict) -> None:
         """Apply tool manipulations for the current attack."""
         if not overrides:
             return
 
-        from src.agent.tools import price, news, risk
+        from src.agent.tools import correlation, fundamentals, news, position, price, risk
 
-        if "price" in overrides:
-            price.set_mode(**overrides["price"])
-        if "news" in overrides:
-            news.set_mode(**overrides["news"])
-        if "risk" in overrides:
-            risk.set_mode(**overrides["risk"])
+        handlers = {
+            "price": price.set_mode,
+            "get_price": price.set_mode,
+            "news": news.set_mode,
+            "get_news": news.set_mode,
+            "risk": risk.set_mode,
+            "calculate_risk": risk.set_mode,
+            "correlation": correlation.set_mode,
+            "get_correlation": correlation.set_mode,
+            "fundamentals": fundamentals.set_mode,
+            "get_fundamentals": fundamentals.set_mode,
+            "position": position.set_mode,
+            "check_position_limits": position.set_mode,
+        }
+
+        for key, params in overrides.items():
+            handler = handlers.get(key)
+            if handler is None:
+                logger.warning("Ignoring unknown tool override key: %s", key)
+                continue
+            handler(**params)
 
     def _reset_tool_overrides(self) -> None:
         """Reset all tool modes to normal."""
-        from src.agent.tools import price, news, risk
+        from src.agent.tools import (
+            correlation,
+            fundamentals,
+            news,
+            position,
+            price,
+            recommendation,
+            risk,
+        )
 
         price.reset_mode()
         news.reset_mode()
         risk.reset_mode()
+        correlation.reset_mode()
+        fundamentals.reset_mode()
+        position.reset_mode()
+        recommendation.clear_recommendations()
 
     def _defense_label(self) -> str:
         if not self.defenses:

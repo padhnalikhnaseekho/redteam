@@ -1,0 +1,12 @@
+<svg width="360" height="96" viewBox="0 0 360 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="360" height="96" rx="18" fill="#0B1220"/>
+  <rect x="18" y="18" width="60" height="60" rx="16" fill="#E8F3F1"/>
+  <path d="M31 61L47 35L63 61H31Z" fill="#0F766E"/>
+  <path d="M47 35L54.8 48H39.2L47 35Z" fill="#F59E0B"/>
+  <path d="M28 68H68" stroke="#0B1220" stroke-width="5" stroke-linecap="round"/>
+  <path d="M94 37H129" stroke="#14B8A6" stroke-width="5" stroke-linecap="round"/>
+  <path d="M94 49H153" stroke="#CBD5E1" stroke-width="5" stroke-linecap="round"/>
+  <path d="M94 61H139" stroke="#64748B" stroke-width="5" stroke-linecap="round"/>
+  <text x="168" y="44" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800" fill="#F8FAFC">Commodity</text>
+  <text x="168" y="69" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="800" fill="#14B8A6">RedTeam</text>
+</svg>

@@ -48,11 +48,13 @@ class MultiAgentDefense(Defense):
 
     def __init__(
         self,
-        reviewer_model: str = "gemini-flash",
+        reviewer_model: str = "vertex-gemini-flash",
         llm_client: Any | None = None,
+        fail_closed: bool = True,
     ) -> None:
         self._reviewer_model = reviewer_model
         self._llm_client = llm_client
+        self._fail_closed = fail_closed
 
     def _get_client(self) -> Any:
         if self._llm_client is None:
@@ -86,11 +88,13 @@ class MultiAgentDefense(Defense):
             response = client.chat(self._reviewer_model, messages)
             review = self._parse_review(response["content"])
         except Exception as e:
-            # If review fails, flag but allow (fail-open with warning)
             return DefenseResult(
-                allowed=True,
-                flags=[f"reviewer_error:{str(e)}"],
-                confidence=0.3,
+                allowed=not self._fail_closed,
+                flags=[
+                    f"reviewer_error:{type(e).__name__}:{str(e)}",
+                    "reviewer:fail_closed" if self._fail_closed else "reviewer:fail_open",
+                ],
+                confidence=1.0 if self._fail_closed else 0.3,
             )
 
         flags: list[str] = []

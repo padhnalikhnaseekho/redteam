@@ -10,7 +10,7 @@ import json
 import re
 from typing import Any, Optional
 
-from src.attacks.base import Attack, AttackCategory, AttackResult
+from src.attacks.base import Attack, AttackCategory, AttackResult, Severity
 from src.utils.llm import LLMClient
 
 _GENERATOR_SYSTEM_PROMPT = """\
@@ -331,12 +331,16 @@ class _GeneratedAttack(Attack):
             cat = AttackCategory(category_str)
         except ValueError:
             cat = AttackCategory.V1_DIRECT_INJECTION
+        try:
+            severity = Severity(raw.get("severity", "high"))
+        except ValueError:
+            severity = Severity.HIGH
 
         super().__init__(
             id=f"gen_r{round_num}_{index}",
             name=f"Generated attack round {round_num} #{index}",
             category=cat,
-            severity="high",
+            severity=severity,
             description=raw.get("target_action", "Generated attack"),
             target_action=raw.get("target_action", "unknown"),
             commodity=raw.get("commodity", "all"),

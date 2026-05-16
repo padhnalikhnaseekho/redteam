@@ -98,26 +98,24 @@ pip install -r requirements.txt
 
 ## 3. Environment Variables
 
-All env vars are loaded at startup via `python-dotenv` (`load_dotenv()` in `src/utils/llm.py`). The `.env.example` file documents them:
+All env vars are loaded at startup via `python-dotenv` (`load_dotenv()` in `src/utils/llm.py`). The `.env.example` file documents them.
 
-### Required
+### GCP-Native Vertex AI
+
+| Variable | Provider | Purpose |
+|---|---|---|
+| `GOOGLE_CLOUD_PROJECT` | Vertex AI | GCP project used by `provider: vertex` models when `project_id` is not set in `config/models.yaml` |
+
+Vertex AI models use Application Default Credentials. In Cloud Run this comes from the assigned service account; locally use `gcloud auth application-default login`.
+
+### Direct Provider Keys
 
 | Variable | Provider | Purpose |
 |---|---|---|
 | `ANTHROPIC_API_KEY` | Anthropic | Claude claude-sonnet-4-20250514 |
 | `MISTRAL_API_KEY` | Mistral | mistral-large-latest |
-
-### Free-Tier (Recommended)
-
-| Variable | Provider | Purpose |
-|---|---|---|
 | `GOOGLE_API_KEY` | Google AI Studio | gemini-2.0-flash |
 | `GROQ_API_KEY` | Groq | llama-3.3-70b-versatile, qwen/qwen3-32b, llama-4-scout |
-
-### Optional (Paid)
-
-| Variable | Provider | Purpose |
-|---|---|---|
 | `OPENAI_API_KEY` | OpenAI | gpt-4o (model config commented out in `models.yaml`) |
 
 ### How `LLMClient` Selects a Provider
@@ -125,8 +123,10 @@ All env vars are loaded at startup via `python-dotenv` (`load_dotenv()` in `src/
 1. `LLMClient.chat(model_name, messages)` is called.
 2. `_model_cfg(model_name)` looks up `model_name` in `config/models.yaml` (loaded at `__post_init__`). Underscores are normalized to hyphens.
 3. The `provider` field in the model config determines which SDK client is used.
-4. Clients are initialized lazily and cached in `_clients` dict. The appropriate `*_API_KEY` is read from `os.environ` at first use.
-5. If a required API key is absent, `os.environ["KEY"]` raises `KeyError` at the point of first provider use.
+4. Clients are initialized lazily and cached in `_clients` dict.
+5. Direct providers read the appropriate `*_API_KEY` from `os.environ` at first use.
+6. Vertex providers create `google.genai.Client(vertexai=True, project=..., location=...)` and use ADC instead of API keys.
+7. If a required direct provider API key is absent, `os.environ["KEY"]` raises `KeyError` at the point of first provider use.
 
 ---
 

@@ -31,12 +31,15 @@ agent = CommodityTradingAgent(
 ```
 
 **Provider selection:** Determined by string matching on `model_name`:
+- Config key with `provider: vertex`, `family: gemini` → `ChatGoogleGenerativeAI(vertexai=True)` using ADC, `GOOGLE_CLOUD_PROJECT`, and model-level `location`
 - `"claude"` / `"anthropic"` → `ChatAnthropic`
 - `"gemini"` → `ChatGoogleGenerativeAI`
 - `"groq"` / `"llama"` / `"mixtral"` → `ChatGroq`
 - `"mistral"` → `ChatMistralAI`
 - `"gpt"` / `"o1"` / `"o3"` → `ChatOpenAI`
 - Default → `ChatAnthropic`
+
+When `model_name` is a key in `config/models.yaml`, the agent first checks the model config. Vertex entries use `model_id` for the actual Vertex model name; the public key such as `vertex-gemini-pro` remains the benchmark/config label.
 
 ### Analysis
 

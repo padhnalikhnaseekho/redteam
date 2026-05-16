@@ -150,9 +150,12 @@ def chat(
 **Invariants:**
 - Raises `ValueError` if `model_name` not in models.yaml (after normalization)
 - Raises `KeyError` if required API key env var is missing
+- For `provider: vertex`, raises `EnvironmentError` if no GCP project is available from `GOOGLE_CLOUD_PROJECT` or model config `project_id`
+- For `provider: vertex`, raises `NotImplementedError` for non-Gemini families until partner model adapters are added
 - Raises `concurrent.futures.TimeoutError` if provider takes > `timeout` seconds
 - Usage is logged to `self.usage_log` as `UsageRecord`
 - Google provider does NOT support `tools` parameter (returns `tool_calls: None` always)
+- Vertex Gemini provider does NOT support `tools` through `LLMClient`; use `CommodityTradingAgent` for LangChain tool-calling
 
 ---
 

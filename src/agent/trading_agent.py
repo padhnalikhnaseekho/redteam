@@ -2,6 +2,7 @@
 
 import json
 import logging
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, Optional
@@ -121,6 +122,32 @@ class CommodityTradingAgent:
     def _create_llm(self) -> Any:
         """Create the LangChain LLM based on model_name."""
         model = self.model_name.lower()
+        model_cfg = self._model_config(self.model_name)
+
+        if model_cfg and model_cfg.get("provider") == "vertex":
+            family = model_cfg.get("family", "gemini")
+            if family != "gemini":
+                raise NotImplementedError(
+                    "CommodityTradingAgent currently supports Vertex Gemini only. "
+                    f"Configured Vertex family '{family}' needs a dedicated adapter."
+                )
+            from langchain_google_genai import ChatGoogleGenerativeAI
+
+            project_env = model_cfg.get("project_id_env", "GOOGLE_CLOUD_PROJECT")
+            project = model_cfg.get("project_id") or os.environ.get(project_env)
+            if not project:
+                raise EnvironmentError(
+                    "Vertex model config requires a GCP project. Set "
+                    f"{project_env} or add 'project_id' to the model config."
+                )
+
+            return ChatGoogleGenerativeAI(
+                model=model_cfg["model_id"],
+                project=project,
+                location=model_cfg.get("location", "us-central1"),
+                vertexai=True,
+                temperature=self.temperature,
+            )
 
         if "claude" in model or "anthropic" in model:
             from langchain_anthropic import ChatAnthropic
@@ -129,6 +156,7 @@ class CommodityTradingAgent:
                 model=self.model_name,
                 temperature=self.temperature,
             )
+
         elif "gemini" in model:
             from langchain_google_genai import ChatGoogleGenerativeAI
 
@@ -165,6 +193,18 @@ class CommodityTradingAgent:
                 model=self.model_name,
                 temperature=self.temperature,
             )
+
+    def _model_config(self, model_name: str) -> dict[str, Any] | None:
+        """Resolve model configuration from config/models.yaml when a key is used."""
+        path = Path(__file__).resolve().parent.parent.parent / "config" / "models.yaml"
+        if not path.exists():
+            return None
+        with open(path, "r") as f:
+            models = (yaml.safe_load(f) or {}).get("models", {})
+        if model_name in models:
+            return models[model_name]
+        normalized = model_name.replace("_", "-")
+        return models.get(normalized)
 
     def _create_agent(self) -> Any:
         """Create the LangChain agent executor."""
