@@ -80,20 +80,24 @@ def build_defenses(name: str) -> list[Defense]:
             PerplexityFilterDefense(),
             SemanticInputFilterDefense(),
         ])]
-    if name == "ensemble_trained":
-        # XGBoost-trained ensemble — expects results/ensemble_defense_classifier.pkl
-        # to exist (run scripts/train_ensemble_defense.py first). Falls back
-        # to voting if the artefact is missing, but emits a warning so the
-        # caller knows they're getting the untrained behaviour.
+    # All ensemble_trained_* configs share an implementation; they differ
+    # only in which trained classifier pickle they load. §5.6.9 compares
+    # the three training sources side-by-side.
+    _TRAINED_SOURCES = {
+        "ensemble_trained": "results/ensemble_defense_classifier.pkl",
+        "ensemble_trained_v1to7": "results/ensemble_defense_classifier_v1to7.pkl",
+        "ensemble_trained_advbench": "results/ensemble_defense_classifier_advbench.pkl",
+    }
+    if name in _TRAINED_SOURCES:
         from src.defenses.ensemble_defense import EnsembleDefense
         from src.defenses.input_filter import InputFilterDefense
         from src.defenses.perplexity_filter import PerplexityFilterDefense
         from src.defenses.semantic_filter import SemanticInputFilterDefense
-        clf_path = Path("results/ensemble_defense_classifier.pkl")
+        clf_path = Path(_TRAINED_SOURCES[name])
         if not clf_path.exists():
             logger.warning(
-                "ensemble_trained requested but %s not found — falling back to voting",
-                clf_path,
+                "%s requested but %s not found — falling back to voting",
+                name, clf_path,
             )
             model_path = None
         else:
@@ -107,10 +111,10 @@ def build_defenses(name: str) -> list[Defense]:
             model_path=model_path,
         )
         # Override the class-level name so the evaluator's _defense_label()
-        # distinguishes trained from untrained ensemble in the result rows.
-        # Without this, both configs label themselves "ensemble_defense" and
-        # the summary table merges their cells.
-        defense.name = "ensemble_trained"
+        # distinguishes the three trained variants and the untrained one in
+        # the result rows; without this they would all collapse to
+        # "ensemble_defense" in the summary table.
+        defense.name = name
         return [defense]
     raise ValueError(f"Unknown defense config: {name!r}")
 
@@ -147,11 +151,13 @@ def main() -> None:
             "semantic_input_filter",
             "ensemble",
             "ensemble_trained",
+            "ensemble_trained_v1to7",
+            "ensemble_trained_advbench",
         ],
         help=(
-            "Defense configs to test, one run per config. 'none' is the baseline; "
-            "'ensemble_trained' requires results/ensemble_defense_classifier.pkl "
-            "(produced by scripts/train_ensemble_defense.py)."
+            "Defense configs to test, one run per config. 'none' is the baseline. "
+            "ensemble_trained* configs require their respective classifier pickle "
+            "(produced by scripts/train_ensemble_defense.py --source ...)."
         ),
     )
     parser.add_argument("--out", default="results/gcg_defense_replay.json")

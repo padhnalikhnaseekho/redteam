@@ -246,21 +246,34 @@ def run_transferability(models: list[str], surrogate: str) -> dict:
         return json.load(f)
 
 
+def _training_artefacts(source: str) -> tuple[str, str]:
+    """Match scripts/train_ensemble_defense.py:_default_paths for the in-container side."""
+    if source == "gcg":
+        return (
+            "results/ensemble_defense_classifier.pkl",
+            "results/ensemble_defense_training_metrics.json",
+        )
+    return (
+        f"results/ensemble_defense_classifier_{source}.pkl",
+        f"results/ensemble_defense_training_metrics_{source}.json",
+    )
+
+
 @app.function(
     timeout=60 * 30,
     volumes={VOL_MOUNT: vol, HF_MOUNT: hf_vol},
 )
-def train_ensemble_classifier(surrogate: str) -> dict:
-    """Train EnsembleDefense's XGBoost classifier on the cached GCG suffixes.
+def train_ensemble_classifier(surrogate: str, source: str = "gcg") -> dict:
+    """Train one EnsembleDefense XGBoost classifier per --source value.
 
-    Generates training data (GCG-prefix-+-suffix positives, benign-trading
-    negatives), extracts features by running each base defense, fits XGBoost,
-    and persists both the classifier and the metrics back to the suffix-cache
-    volume so subsequent defense replays pick it up.
+    Three sources supported (see scripts/train_ensemble_defense.py docstring):
+      gcg       — v8 GCG suffix-prepended queries (in-sample baseline)
+      v1to7     — all v1-v7 in-repo attacks (transfer to held-out v8)
+      advbench  — AdvBench public benchmark (out-of-domain transfer)
 
-    Output (in volume `redteam-gcg-cache`):
-      /cache/ensemble_defense_classifier.pkl
-      /cache/ensemble_defense_training_metrics.json
+    Output files (in volume redteam-gcg-cache) depend on --source; each
+    classifier lands on a distinct filename so the §5.6.9 comparison can
+    load all three side-by-side.
     """
     import os
     import shutil
@@ -272,7 +285,7 @@ def train_ensemble_classifier(surrogate: str) -> dict:
     os.environ["HF_HUB_CACHE"] = f"{HF_MOUNT}/hub"
     vol.reload()
 
-    # Seed both surrogate caches into results/ so the trainer can read them.
+    # Seed surrogate caches into results/ — needed for --source=gcg.
     os.makedirs("results", exist_ok=True)
     for cache_name in (
         _cache_filename("gpt2-xl"),
@@ -282,24 +295,23 @@ def train_ensemble_classifier(surrogate: str) -> dict:
         if os.path.exists(src):
             shutil.copy(src, f"results/{cache_name}")
 
-    clf_path = "results/ensemble_defense_classifier.pkl"
-    metrics_path = "results/ensemble_defense_training_metrics.json"
+    clf_path, metrics_path = _training_artefacts(source)
 
     subprocess.run(
         [
             sys.executable,
             "scripts/train_ensemble_defense.py",
+            "--source", source,
             "--out", clf_path,
             "--metrics", metrics_path,
         ],
         check=True,
     )
 
-    # Persist the classifier + metrics to the cache volume so the next
-    # run_defense_replay invocation (which runs in a separate container)
-    # can load them.
-    shutil.copy(clf_path, f"{VOL_MOUNT}/ensemble_defense_classifier.pkl")
-    shutil.copy(metrics_path, f"{VOL_MOUNT}/ensemble_defense_training_metrics.json")
+    # Persist outputs to the volume so subsequent run_defense_replay
+    # invocations (separate container) can hydrate them.
+    shutil.copy(clf_path, f"{VOL_MOUNT}/{Path(clf_path).name}")
+    shutil.copy(metrics_path, f"{VOL_MOUNT}/{Path(metrics_path).name}")
     vol.commit()
     hf_vol.commit()
 
@@ -346,12 +358,22 @@ def run_defense_replay(
         )
     shutil.copy(src, dst)
 
-    # If a trained ensemble classifier exists in the volume, hydrate it into
-    # results/ where the defense replay's `ensemble_trained` config expects it.
-    clf_src = f"{VOL_MOUNT}/ensemble_defense_classifier.pkl"
-    if os.path.exists(clf_src):
-        shutil.copy(clf_src, "results/ensemble_defense_classifier.pkl")
-        print(f"Hydrated trained classifier from {clf_src}")
+    # Hydrate every trained ensemble classifier present in the volume. Each
+    # source (gcg / v1to7 / advbench) has its own pickle; defense_replay
+    # picks the right one via the ensemble_trained_* config names.
+    for fname in (
+        "ensemble_defense_classifier.pkl",            # gcg (in-sample baseline)
+        "ensemble_defense_classifier_v1to7.pkl",      # v1-v7 transfer test
+        "ensemble_defense_classifier_advbench.pkl",   # AdvBench out-of-domain
+        # Metrics files come along for the §5.6.9 write-up.
+        "ensemble_defense_training_metrics.json",
+        "ensemble_defense_training_metrics_v1to7.json",
+        "ensemble_defense_training_metrics_advbench.json",
+    ):
+        clf_src = f"{VOL_MOUNT}/{fname}"
+        if os.path.exists(clf_src):
+            shutil.copy(clf_src, f"results/{fname}")
+            print(f"Hydrated {fname}")
 
     subprocess.run(
         [
@@ -379,21 +401,24 @@ def main(
     steps: int = 200,
     batch_size: int = 32,
     models: str = "groq-qwen,groq-llama,groq-scout",
-    defenses: str = "none,input_filter,perplexity_filter,semantic_input_filter,ensemble,ensemble_trained",
+    defenses: str = "none,input_filter,perplexity_filter,semantic_input_filter,ensemble,ensemble_trained,ensemble_trained_v1to7,ensemble_trained_advbench",
+    train_sources: str = "gcg,v1to7,advbench",
 ):
     """Orchestrate Stage 1 (GCG gen), Stage 2 (transferability),
-    optional Stage 2.5 (ensemble training), and optional Stage 3 (defense replay).
+    optional Stage 2.5 (ensemble training over multiple sources), and
+    optional Stage 3 (defense replay).
 
     Defaults: Vicuna-7b surrogate, 200 GCG steps, 3 Groq targets.
 
-    --train-ensemble runs the XGBoost trainer over both cached suffix sets
-    (gpt2-xl + Vicuna) and persists the classifier to the cache volume so
-    the next --run-defenses picks it up via the `ensemble_trained` config.
+    --train-ensemble loops over --train-sources (default: gcg,v1to7,advbench)
+    producing one trained classifier per source. The §5.6.9 comparison
+    pipeline requires all three.
 
     Common patterns:
       modal run scripts/run_gcg_modal.py                                 # full GCG run + transfer
       modal run scripts/run_gcg_modal.py --skip-gen --skip-transfer --run-defenses
       modal run scripts/run_gcg_modal.py --skip-gen --skip-transfer --train-ensemble --run-defenses
+      modal run scripts/run_gcg_modal.py --skip-gen --skip-transfer --train-ensemble --train-sources v1to7,advbench --run-defenses
     """
     out_dir = REPO_ROOT / "results"
     out_dir.mkdir(exist_ok=True)
@@ -422,28 +447,40 @@ def main(
         print(f"  wrote {transfer_path}")
 
     if train_ensemble:
-        print("\n== Stage 2.5: train EnsembleDefense XGBoost classifier ==")
-        train_metrics = train_ensemble_classifier.remote(surrogate=surrogate)
-        metrics_path = out_dir / "ensemble_defense_training_metrics.json"
-        metrics_path.write_text(json.dumps(train_metrics, indent=2, default=str))
-        print(f"  wrote {metrics_path}")
-        # Metrics travel as JSON across the Modal wire and the trainer dumps
-        # numpy scalars via default=str, so the values arrive as strings here.
-        # Coerce defensively rather than assume types.
+        source_list = [s.strip() for s in train_sources.split(",") if s.strip()]
+        print(f"\n== Stage 2.5: train EnsembleDefense XGBoost (sources={source_list}) ==")
+
         def _f(v) -> float:
             try:
                 return float(v)
             except (TypeError, ValueError):
                 return float("nan")
-        print(f"  train_auc={_f(train_metrics.get('train_auc')):.3f}  "
-              f"cv_auc={_f(train_metrics.get('cv_auc_mean')):.3f}±"
-              f"{_f(train_metrics.get('cv_auc_std')):.3f}  "
-              f"n_samples={train_metrics.get('n_samples')}")
-        top_importances = list(train_metrics.get("feature_importances", {}).items())[:5]
-        if top_importances:
-            print("  top features:")
-            for name, imp in top_importances:
-                print(f"    {name:40} {_f(imp):.4f}")
+
+        for src in source_list:
+            print(f"\n  --- source: {src} ---")
+            train_metrics = train_ensemble_classifier.remote(
+                surrogate=surrogate, source=src,
+            )
+            # Mirror the trainer's filename convention so the local copies
+            # live alongside the gcg metrics (and survive between runs).
+            metrics_name = (
+                "ensemble_defense_training_metrics.json" if src == "gcg"
+                else f"ensemble_defense_training_metrics_{src}.json"
+            )
+            metrics_path = out_dir / metrics_name
+            metrics_path.write_text(json.dumps(train_metrics, indent=2, default=str))
+            print(f"    wrote {metrics_path}")
+            print(
+                f"    train_auc={_f(train_metrics.get('train_auc')):.3f}  "
+                f"cv_auc={_f(train_metrics.get('cv_auc_mean')):.3f}±"
+                f"{_f(train_metrics.get('cv_auc_std')):.3f}  "
+                f"n+={train_metrics.get('n_positive')} n-={train_metrics.get('n_negative')}"
+            )
+            top_importances = list(train_metrics.get("feature_importances", {}).items())[:5]
+            if top_importances:
+                print("    top features:")
+                for name, imp in top_importances:
+                    print(f"      {name:40} {_f(imp):.4f}")
 
     if run_defenses:
         defense_list = [d.strip() for d in defenses.split(",") if d.strip()]
