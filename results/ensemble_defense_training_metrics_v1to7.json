@@ -1,18 +1,18 @@
 {
-  "train_auc": 0.9830729166666666,
-  "cv_auc_mean": 0.7971428571428572,
-  "cv_auc_std": 0.07160929518199843,
-  "n_samples": 56,
+  "train_auc": 0.9941666666666666,
+  "cv_auc_mean": 0.75,
+  "cv_auc_std": 0.15033296378372912,
+  "n_samples": 74,
   "n_features": 13,
-  "n_attacks": 32,
+  "n_attacks": 50,
   "n_legitimate": 24,
   "feature_importances": {
-    "mean_confidence": "0.7944163",
-    "semantic_input_filter_input_confidence": "0.20558374",
+    "mean_confidence": "0.47477958",
+    "semantic_input_filter_input_confidence": "0.44671574",
+    "max_flags": "0.07850469",
     "input_filter_input_blocked": "0.0",
     "input_filter_input_confidence": "0.0",
     "input_filter_input_n_flags": "0.0",
-    "max_flags": "0.0",
     "n_defenses_blocking": "0.0",
     "perplexity_filter_input_blocked": "0.0",
     "perplexity_filter_input_confidence": "0.0",
@@ -21,7 +21,7 @@
     "semantic_input_filter_input_n_flags": "0.0",
     "total_flags": "0.0"
   },
-  "source": "gcg",
-  "n_positive": 32,
+  "source": "v1to7",
+  "n_positive": 50,
   "n_negative": 24
 }
