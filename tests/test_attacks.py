@@ -108,15 +108,21 @@ class TestV9PAIR:
     """v9 PAIR attacks: registration, offline fallback, and evaluator truth tables."""
 
     @pytest.fixture(autouse=True)
-    def _offline_pair(self, monkeypatch):
+    def _offline_pair(self, monkeypatch, tmp_path):
         """Force PAIRRunner into offline mode for all tests in this class.
 
-        Why: without this guard, prepare() against a live GROQ_API_KEY runs
-        up to 8 iterations of real LLM calls per attack, every test run.
+        Why monkeypatch _maybe_load_llm directly: deleting GROQ_API_KEY is
+        not enough — `src.utils.llm` calls `load_dotenv()` at import time
+        which re-populates the var from the project's .env file, putting
+        the runner back into online mode.
+
+        Why redirect cache_path: even with no LLM, a leaked online run
+        would otherwise write to the real `results/pair_attack_cache.json`.
         """
-        monkeypatch.delenv("GROQ_API_KEY", raising=False)
-        # Reset the module-level singleton so the env-var change takes effect.
         import src.attacks.v9_pair_iterative as v9
+        monkeypatch.setattr(v9.PAIRRunner, "_maybe_load_llm", staticmethod(lambda: None))
+        monkeypatch.delenv("PAIR_CACHE_URI", raising=False)
+        monkeypatch.setattr(v9, "_CACHE_DEFAULT", tmp_path / "pair_test_cache.json")
         monkeypatch.setattr(v9, "_runner", None)
         yield
 
