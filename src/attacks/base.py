@@ -13,6 +13,7 @@ class AttackCategory(str, Enum):
     V7_MULTI_STEP_COMPOUNDING = "v7_multi_step_compounding"
     V8_GCG_ADVERSARIAL = "v8_gcg_adversarial"
     V9_PAIR_ITERATIVE = "v9_pair_iterative"
+    V12_CRESCENDO_MULTITURN = "v12_crescendo_multiturn"
 
 
 class Severity(str, Enum):
