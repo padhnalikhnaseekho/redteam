@@ -1,0 +1,22 @@
+substitutions:
+  _RESULTS_BUCKET: project-e0bbb103-9e5b-4402-866-redteam-demo-results
+
+serviceAccount: projects/project-e0bbb103-9e5b-4402-866/serviceAccounts/redteam-demo-build@project-e0bbb103-9e5b-4402-866.iam.gserviceaccount.com
+
+steps:
+  - name: python:3.12-slim
+    id: publish-historical-results
+    entrypoint: sh
+    args:
+      - -ceu
+      - |
+        python -m pip install --no-cache-dir -r requirements-publisher.txt
+        python scripts/publish_results_to_dashboard.py \
+          --results-dir results \
+          --bucket="${_RESULTS_BUCKET}" \
+          --project-id="$PROJECT_ID" \
+          --commit-sha="$COMMIT_SHA" \
+          --branch-name="$BRANCH_NAME"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
