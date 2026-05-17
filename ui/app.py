@@ -1998,6 +1998,18 @@ with results_tab:
         meta_cols[2].metric("Attacks", len(metadata.get("attack_ids", [])))
         meta_cols[3].metric("Tokens", metadata.get("total_tokens", {}).get("input", 0) + metadata.get("total_tokens", {}).get("output", 0))
 
+        import_summary = metadata.get("import_summary", {})
+        if metadata.get("historical_import"):
+            st.info(import_summary.get("reader_note", "Historical result artifacts were imported for dashboard review."))
+            simulated_impact = pd.to_numeric(import_summary.get("simulated_impact_usd", 0), errors="coerce")
+            simulated_impact = 0 if pd.isna(simulated_impact) else float(simulated_impact)
+            import_cols = st.columns(4)
+            import_cols[0].metric("Source Artifacts", import_summary.get("artifact_count", 0))
+            import_cols[1].metric("Normalized Rows", import_summary.get("normalized_result_count", 0))
+            import_cols[2].metric("Successful Attacks", import_summary.get("successful_attacks", 0))
+            import_cols[3].metric("Simulated Impact", f"${simulated_impact:,.0f}")
+            st.caption(f"Source: {metadata.get('source_path', 'historical results')}")
+
         summary_df = pd.DataFrame(summary.get("groups", []))
         results_df = pd.DataFrame(result_rows)
         if summary_df.empty and results_df.empty:

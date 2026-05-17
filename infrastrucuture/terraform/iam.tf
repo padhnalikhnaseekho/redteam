@@ -40,6 +40,10 @@ locals {
       role   = "roles/logging.logWriter"
       member = "serviceAccount:${google_service_account.build.email}"
     }
+    build_datastore_user = {
+      role   = "roles/datastore.user"
+      member = "serviceAccount:${google_service_account.build.email}"
+    }
   }
 }
 
@@ -70,6 +74,12 @@ resource "google_storage_bucket_iam_member" "worker_results_admin" {
   bucket = google_storage_bucket.results.name
   role   = "roles/storage.objectAdmin"
   member = "serviceAccount:${google_service_account.worker.email}"
+}
+
+resource "google_storage_bucket_iam_member" "build_results_admin" {
+  bucket = google_storage_bucket.results.name
+  role   = "roles/storage.objectUser"
+  member = "serviceAccount:${google_service_account.build.email}"
 }
 
 resource "google_service_account_iam_member" "api_can_use_tasks_oidc_identity" {
