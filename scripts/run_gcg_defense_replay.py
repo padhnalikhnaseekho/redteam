@@ -82,11 +82,19 @@ def build_defenses(name: str) -> list[Defense]:
         ])]
     # All ensemble_trained_* configs share an implementation; they differ
     # only in which trained classifier pickle they load. §5.6.9 compares
-    # the three training sources side-by-side.
+    # the three training sources side-by-side. `ensemble_trained_gcg_expanded`
+    # is a follow-up artefact that retrains --source gcg against the full
+    # 12-suffix cache (4 gpt2xl + 8 vicuna) rather than the 8-suffix snapshot
+    # the §5.6.9/§5.6.10 canonical classifier was trained on. Because the
+    # expanded classifier has seen the v8.5–v8.8 suffixes, it is NOT a valid
+    # stand-in for the canonical "in-sample baseline" in §5.6.10's held-out
+    # framing — use it only for robustness comparisons that explicitly note
+    # the changed training set.
     _TRAINED_SOURCES = {
         "ensemble_trained": "results/ensemble_defense_classifier.pkl",
         "ensemble_trained_v1to7": "results/ensemble_defense_classifier_v1to7.pkl",
         "ensemble_trained_advbench": "results/ensemble_defense_classifier_advbench.pkl",
+        "ensemble_trained_gcg_expanded": "results/ensemble_defense_classifier_gcg_expanded.pkl",
     }
     if name in _TRAINED_SOURCES:
         from src.defenses.ensemble_defense import EnsembleDefense
