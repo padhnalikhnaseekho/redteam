@@ -56,6 +56,7 @@ def _auto_discover():
         "v7_multi_step_compounding",
         "v8_gcg_adversarial",
         "v9_pair_iterative",
+        "v10_rag_poison",
         "v11_autodan_genetic",
         "v12_crescendo_multiturn",
     ]
