@@ -10,11 +10,18 @@ the intro slides (1-7), then adds new content:
   - Challenges & open items
 
 Usage:
+    # Use defaults (defense_layers_0405_1315 + default IIT template)
     python scripts/create_final_pptx.py
+
+    # Point at a different results dir (e.g. the cloud-headline run)
+    python scripts/create_final_pptx.py \\
+        --results-dir results/cloud_headline \\
+        --out results/cloud_headline/report/RedTeam_Final_Report.pptx
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from copy import deepcopy
@@ -140,11 +147,55 @@ def copy_slides(src_prs, dst_prs, indices):
             dst_tree.append(new_el)
 
 
+_DEFAULT_TEMPLATE = "results/results_0329_1945/report/RedTeam_Combined.pptx"
+_DEFAULT_RESULTS_DIR = "results/defense_layers_0405_1315"
+
+
+def _parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    parser.add_argument(
+        "--results-dir",
+        default=_DEFAULT_RESULTS_DIR,
+        help=(
+            "Experiment/results directory containing the data to render. "
+            f"Default: {_DEFAULT_RESULTS_DIR}. The script looks for "
+            "report/experiment_summary.json and tolerates its absence."
+        ),
+    )
+    parser.add_argument(
+        "--template",
+        default=_DEFAULT_TEMPLATE,
+        help=(
+            "IIT slide template PPTX (intro slides + bg images). "
+            f"Default: {_DEFAULT_TEMPLATE}. This is a fixed design asset; "
+            "override only if you have a newer template."
+        ),
+    )
+    parser.add_argument(
+        "--out",
+        default=None,
+        help=(
+            "Output PPTX path. Default: <results-dir>/report/RedTeam_Final_Report.pptx."
+        ),
+    )
+    return parser.parse_args()
+
+
 def main():
+    args = _parse_args()
     project_dir = Path(__file__).resolve().parents[1]
-    combined_path = project_dir / "results/results_0329_1945/report/RedTeam_Combined.pptx"
-    exp_dir = project_dir / "results/defense_layers_0405_1315"
+    combined_path = (Path(args.template) if Path(args.template).is_absolute()
+                     else project_dir / args.template)
+    exp_dir = (Path(args.results_dir) if Path(args.results_dir).is_absolute()
+               else project_dir / args.results_dir)
     report_dir = exp_dir / "report"
+
+    if not combined_path.exists():
+        print(f"ERROR: template not found at {combined_path}", file=sys.stderr)
+        sys.exit(2)
+    if not exp_dir.exists():
+        print(f"ERROR: results dir not found at {exp_dir}", file=sys.stderr)
+        sys.exit(2)
 
     # Load source presentation and experiment data
     src_prs = Presentation(str(combined_path))
@@ -474,7 +525,11 @@ def main():
     copy_slides(src_prs, prs2, list(range(18, 29)))
 
     # ── Save ──
-    out_path = project_dir / "results" / "defense_layers_0405_1315" / "report" / "RedTeam_Final_Report.pptx"
+    if args.out:
+        out_path = Path(args.out) if Path(args.out).is_absolute() else project_dir / args.out
+    else:
+        out_path = report_dir / "RedTeam_Final_Report.pptx"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
     prs2.save(str(out_path))
     print(f"Saved: {out_path}")
     print(f"Total slides: {len(prs2.slides)}")
