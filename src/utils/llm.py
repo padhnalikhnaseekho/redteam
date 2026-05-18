@@ -9,7 +9,7 @@ from typing import Any
 import yaml
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(Path.home()/ ".env")
 
 CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "models.yaml"
 
@@ -74,6 +74,12 @@ class LLMClient:
                 project=project,
                 location=location,
             )
+        elif provider == "ollama":
+            from openai import OpenAI
+            # api_key is any key will work as its on your local
+            client = OpenAI(base_url="http://localhost:11434/v1",
+                            api_key="ollama")
+
         else:
             raise ValueError(f"Unknown provider: {provider}")
 
@@ -139,6 +145,8 @@ class LLMClient:
                 return self._chat_groq(client, cfg, messages, tools)
             elif provider == "vertex":
                 return self._chat_vertex(client, cfg, messages, tools)
+            elif provider == "ollama":
+                return self._chat_openai(client, cfg, messages, tools)
             else:
                 raise ValueError(f"Unknown provider: {provider}")
 

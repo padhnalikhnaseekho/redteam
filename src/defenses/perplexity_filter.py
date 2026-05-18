@@ -40,9 +40,13 @@ from .base import Defense, DefenseResult
 
 logger = logging.getLogger(__name__)
 
-
+#TODO: input should be tokenized from the same tokenizer as used in llm model, Compare perplexity only within same model+tokenizer setup.
 class PerplexityFilterDefense(Defense):
-    """Detects prompt injections via perplexity spike analysis.
+    """
+    Perplexity (PPL) is a measure of how “surprised” a language model is by a text sequence.
+    Lower perplexity = model finds the text more likely / natural.
+    Higher perplexity = model finds it unusual / hard to predict.
+    Detects prompt injections via perplexity spike analysis.
 
     Uses GPT-2 (small, local, fast) to compute windowed perplexity
     across input text. Injections cause measurable perplexity spikes
