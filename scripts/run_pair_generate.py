@@ -48,6 +48,24 @@ from src.agent.system_prompt import DEFAULT_SYSTEM_PROMPT
 logging.basicConfig(level=logging.INFO, format="%(levelname)s  %(message)s")
 logger = logging.getLogger(__name__)
 
+
+def _has_llm_credentials() -> bool:
+    """Return True if either Groq or Vertex AI credentials are available.
+
+    Groq is detected via GROQ_API_KEY. Vertex AI is detected by attempting
+    to resolve Application Default Credentials via ``google.auth.default()``;
+    on Cloud Run this returns the workload identity, on a laptop it returns
+    whatever ``gcloud auth application-default login`` configured.
+    """
+    if os.environ.get("GROQ_API_KEY"):
+        return True
+    try:
+        import google.auth  # type: ignore[import-not-found]
+        google.auth.default()
+        return True
+    except Exception:
+        return False
+
 # (goal_key, goal_description) pulled from the four v9 attack classes so the
 # seeder and the runtime agree on what each cache entry means.
 _ATTACK_CLASSES = [
@@ -99,13 +117,13 @@ def main() -> None:
     )
     parser.add_argument(
         "--attacker-model",
-        default="groq-llama",
-        help="Model used by the attacker LLM (default: groq-llama)",
+        default="vertex-gemini-flash",
+        help="Model used by the attacker LLM (default: vertex-gemini-flash)",
     )
     parser.add_argument(
         "--judge-model",
-        default="groq-llama",
-        help="Model used by the judge LLM (default: groq-llama)",
+        default="vertex-gemini-flash",
+        help="Model used by the judge LLM (default: vertex-gemini-flash)",
     )
     parser.add_argument(
         "--max-iterations",
@@ -131,11 +149,13 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    if not os.environ.get("GROQ_API_KEY"):
+    if not _has_llm_credentials():
         logger.error(
-            "GROQ_API_KEY not set. PAIR cannot iterate without a live attacker "
-            "LLM. Either export GROQ_API_KEY, or accept the offline fallback "
-            "(PRECOMPUTED_PROMPTS) at benchmark time without running this seeder."
+            "Neither GROQ_API_KEY nor Vertex AI Application Default Credentials "
+            "are available. PAIR cannot iterate without a live attacker LLM. "
+            "Either export GROQ_API_KEY, run `gcloud auth application-default "
+            "login`, or accept the offline fallback (PRECOMPUTED_PROMPTS) at "
+            "benchmark time without running this seeder."
         )
         sys.exit(1)
 
