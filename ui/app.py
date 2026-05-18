@@ -1821,8 +1821,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-overview_tab, run_tab, results_tab, live_tab, catalog_tab = st.tabs(
-    ["Overview", "Run Benchmark", "Results Explorer", "Live Attack", "Catalog"]
+overview_tab, run_tab, results_tab, live_tab, explainability_tab, catalog_tab = st.tabs(
+    ["Overview", "Run Benchmark", "Results Explorer", "Live Attack", "Explainability", "Catalog"]
 )
 
 with overview_tab:
@@ -2188,6 +2188,303 @@ with live_tab:
             render_enterprise_live_result(result, selected_attack, additional_prompt)
         except Exception as exc:
             st.error(f"Run failed: {exc}")
+
+with explainability_tab:
+    st.subheader("Explainability & Depth Analysis")
+    st.caption(
+        "Renders the post-benchmark artifacts produced by "
+        "`scripts/run_advanced_analysis.py` and `scripts/generate_report.py` "
+        "(SHAP, Bayesian posteriors, transferability matrices, ROC curves, "
+        "Shapley defense attribution). Artifacts must be present on the "
+        "selected job's GCS prefix — backfill via `scripts/backfill_jobs_to_gcs.py` "
+        "if you ran the analysis locally."
+    )
+
+    _completed_jobs = [j for j in jobs if j.get("status") == "completed" and j.get("result_uri")]
+    if not _completed_jobs:
+        st.info(
+            "No completed jobs found. Submit a benchmark from the Run Benchmark tab, "
+            "then run `scripts/run_advanced_analysis.py` locally and backfill the "
+            "result via `scripts/backfill_jobs_to_gcs.py` to populate this tab."
+        )
+    else:
+        def _job_label(job: dict) -> str:
+            summary = job.get("summary") or {}
+            asr = summary.get("asr_pct")
+            asr_str = f"{asr}% ASR" if asr is not None else "no summary"
+            return f"{job['job_id']} · {asr_str}"
+
+        _job_idx = st.selectbox(
+            "Select a completed job",
+            range(len(_completed_jobs)),
+            format_func=lambda i: _job_label(_completed_jobs[i]),
+            key="explainability_job_select",
+        )
+        _selected_job = _completed_jobs[_job_idx]
+        _job_id = _selected_job["job_id"]
+
+        try:
+            _artifacts_payload = load_artifacts(_job_id)
+        except Exception as exc:
+            st.error(f"Could not list artifacts for {_job_id}: {exc}")
+            _artifacts_payload = {"artifacts": []}
+
+        _artifact_index: dict[str, dict] = {}
+        for art in _artifacts_payload.get("artifacts", []):
+            _artifact_index[art["name"]] = art
+            # Allow lookup by basename too (matches files under nested dirs like report/).
+            _artifact_index.setdefault(art["name"].rsplit("/", 1)[-1], art)
+
+        def _find_artifact(*candidates: str) -> dict | None:
+            for name in candidates:
+                if name in _artifact_index:
+                    return _artifact_index[name]
+            # Suffix match fallback (e.g. matches "results_0329_1945/report/shap_summary.png").
+            for name in candidates:
+                for full_name, art in _artifact_index.items():
+                    if full_name.endswith("/" + name) or full_name == name:
+                        return art
+            return None
+
+        @st.cache_data(ttl=60)
+        def _download_artifact(job_id: str, download_path: str) -> bytes:
+            return api_download(download_path)
+
+        def _load_png(art: dict | None) -> bytes | None:
+            if not art:
+                return None
+            try:
+                return _download_artifact(_job_id, art["download_path"])
+            except Exception as exc:
+                st.warning(f"Failed to download {art['name']}: {exc}")
+                return None
+
+        def _load_csv(art: dict | None) -> pd.DataFrame | None:
+            if not art:
+                return None
+            import io
+            try:
+                data = _download_artifact(_job_id, art["download_path"])
+                return pd.read_csv(io.BytesIO(data))
+            except Exception as exc:
+                st.warning(f"Failed to parse {art['name']}: {exc}")
+                return None
+
+        def _load_json(art: dict | None) -> dict | list | None:
+            if not art:
+                return None
+            try:
+                data = _download_artifact(_job_id, art["download_path"])
+                return json.loads(data.decode("utf-8"))
+            except Exception as exc:
+                st.warning(f"Failed to parse {art['name']}: {exc}")
+                return None
+
+        def _missing(label: str, basename: str) -> None:
+            st.info(
+                f"`{basename}` not present on this job. "
+                f"Run `scripts/run_advanced_analysis.py --results-dir <local-results>` "
+                f"and backfill via `scripts/backfill_jobs_to_gcs.py` to populate it."
+            )
+
+        # -------- Section 1: Headline visualizations (auto-generated by generate_report.py) --------
+        st.markdown("### Headline visualizations")
+        st.caption("Auto-generated by `scripts/generate_report.py`. Module 4 — model evaluation.")
+
+        _heatmap = _find_artifact("report/heatmap_asr.png", "heatmap_asr.png")
+        _barchart = _find_artifact("report/barchart_defense_asr.png", "barchart_defense_asr.png")
+        _radar = _find_artifact("report/radar_vulnerability.png", "radar_vulnerability.png")
+        _detection = _find_artifact("report/heatmap_detection_coverage.png", "heatmap_detection_coverage.png")
+
+        col_a, col_b = st.columns(2)
+        with col_a:
+            png = _load_png(_heatmap)
+            if png:
+                st.image(png, caption="ASR heatmap (model × attack category)")
+            else:
+                _missing("ASR heatmap", "heatmap_asr.png")
+            png = _load_png(_radar)
+            if png:
+                st.image(png, caption="Vulnerability radar (per-model success profile)")
+            else:
+                _missing("Vulnerability radar", "radar_vulnerability.png")
+        with col_b:
+            png = _load_png(_barchart)
+            if png:
+                st.image(png, caption="Defense effectiveness — ASR per defense config")
+            else:
+                _missing("Defense bar chart", "barchart_defense_asr.png")
+            png = _load_png(_detection)
+            if png:
+                st.image(png, caption="Detection coverage (defense × attack category)")
+            else:
+                _missing("Detection coverage heatmap", "heatmap_detection_coverage.png")
+
+        # -------- Section 2: Bayesian posteriors --------
+        st.markdown("### Bayesian vulnerability posteriors")
+        st.caption(
+            "Beta-Binomial posterior over per-(model, defense) ASR with 95% credible intervals. "
+            "Module 4 — Bayesian analysis. Computed by `src/evaluation/statistical.py::bayesian_vulnerability`."
+        )
+        _bayes = _load_csv(_find_artifact("report/bayesian_vulnerability.csv", "bayesian_vulnerability.csv"))
+        if _bayes is not None:
+            st.dataframe(_bayes, width="stretch", hide_index=True)
+        else:
+            _missing("Bayesian posteriors", "bayesian_vulnerability.csv")
+
+        # -------- Section 3: Cross-model transferability --------
+        st.markdown("### Cross-model transferability")
+        st.caption(
+            "How attacks generalise across target models — the §5.6.9 / §5.7 transfer story. "
+            "Module 2 — transfer learning. Computed by `src/evaluation/transferability.py`."
+        )
+        _xfer_matrix = _load_csv(_find_artifact("report/transferability_matrix.csv", "transferability_matrix.csv"))
+        _xfer_sig = _load_csv(_find_artifact("report/transferability_significance.csv", "transferability_significance.csv"))
+        _xfer_cat = _load_csv(_find_artifact("report/category_transferability.csv", "category_transferability.csv"))
+        if _xfer_matrix is not None:
+            st.markdown("**Per-attack transfer rate T(source → target)**")
+            st.dataframe(_xfer_matrix, width="stretch", hide_index=True)
+        if _xfer_sig is not None:
+            st.markdown("**Fisher's exact test on the 2×2 transfer table** (significant_005 = p < 0.05)")
+            st.dataframe(_xfer_sig, width="stretch", hide_index=True)
+        if _xfer_cat is not None:
+            st.markdown("**Transfer rate stratified by attack category**")
+            st.dataframe(_xfer_cat, width="stretch", hide_index=True)
+        if _xfer_matrix is None and _xfer_sig is None and _xfer_cat is None:
+            _missing("Transferability artifacts", "transferability_*.csv")
+
+        # -------- Section 4: SHAP & defense attribution --------
+        st.markdown("### SHAP feature importance & defense attribution")
+        st.caption(
+            "XGBoost predictor of attack success, explained via SHAP. "
+            "Module 4 — explainability. Computed by `src/evaluation/explainability.py`."
+        )
+        png = _load_png(_find_artifact("report/shap_summary.png", "shap_summary.png"))
+        if png:
+            st.image(png, caption="SHAP beeswarm — which attack metadata features predict success")
+        else:
+            _missing("SHAP summary plot", "shap_summary.png")
+
+        _shap_analysis = _load_json(_find_artifact("report/shap_analysis.json", "shap_analysis.json"))
+        if _shap_analysis:
+            col1, col2, col3 = st.columns(3)
+            cv_auc = _shap_analysis.get("cv_auc_mean")
+            cv_std = _shap_analysis.get("cv_auc_std")
+            n_rows = _shap_analysis.get("n_samples") or _shap_analysis.get("n_rows")
+            with col1:
+                if cv_auc is not None:
+                    delta = f"±{cv_std:.3f}" if cv_std is not None else None
+                    st.metric("Predictor CV AUC", f"{cv_auc:.3f}", delta=delta, delta_color="off")
+            with col2:
+                base_rate = _shap_analysis.get("base_rate")
+                if base_rate is not None:
+                    st.metric("Base attack-success rate", f"{base_rate * 100:.1f}%")
+            with col3:
+                if n_rows is not None:
+                    st.metric("Training rows", f"{int(n_rows):,}")
+            shap_imp = _shap_analysis.get("shap_feature_importance") or _shap_analysis.get("top_features")
+            if isinstance(shap_imp, dict) and shap_imp:
+                st.markdown("**Top features by mean(|SHAP|)**")
+                items = [(k, float(v)) for k, v in shap_imp.items()]
+                items.sort(key=lambda kv: kv[1], reverse=True)
+                feat_df = pd.DataFrame(items, columns=["feature", "mean_abs_shap"])
+                st.dataframe(feat_df.head(15), width="stretch", hide_index=True)
+
+        _defense_shap = _load_json(_find_artifact("report/defense_shap_effects.json", "defense_shap_effects.json"))
+        if _defense_shap:
+            shap_effects = _defense_shap.get("defense_shap_effects") if isinstance(_defense_shap, dict) else None
+            if shap_effects is None and isinstance(_defense_shap, dict) and all(isinstance(v, (int, float, str)) for v in _defense_shap.values()):
+                # Legacy flat-dict shape.
+                shap_effects = _defense_shap
+            if isinstance(shap_effects, dict) and shap_effects:
+                st.markdown("**Defense-level SHAP effect on attack success** (negative = defense reduces ASR)")
+                items = [(k, float(v)) for k, v in shap_effects.items()]
+                items.sort(key=lambda kv: kv[1])  # most-negative first (best defenses)
+                ds_df = pd.DataFrame(items, columns=["defense", "mean_signed_shap"])
+                st.dataframe(ds_df, width="stretch", hide_index=True)
+            cat_shap = _defense_shap.get("category_vulnerability_shap") if isinstance(_defense_shap, dict) else None
+            if isinstance(cat_shap, dict) and cat_shap:
+                st.markdown("**Per-category vulnerability SHAP** (positive = category drives success)")
+                cat_items = [(k, float(v)) for k, v in cat_shap.items()]
+                cat_items.sort(key=lambda kv: kv[1], reverse=True)
+                st.dataframe(pd.DataFrame(cat_items, columns=["attack_category", "mean_signed_shap"]),
+                             width="stretch", hide_index=True)
+            interp = _defense_shap.get("interpretation") if isinstance(_defense_shap, dict) else None
+            if isinstance(interp, str):
+                st.caption(interp)
+
+        _shapley = _load_json(_find_artifact("report/shapley_values.json", "shapley_values.json"))
+        if _shapley:
+            st.markdown("**Defense Shapley values** — game-theoretic attribution over 5! = 120 coalitions")
+            shap_df = pd.DataFrame(list(_shapley.items()), columns=["defense", "shapley_value"])
+            shap_df = shap_df.sort_values("shapley_value", ascending=False)
+            st.dataframe(shap_df, width="stretch", hide_index=True)
+
+        # -------- Section 5: ROC + information-theoretic depth --------
+        st.markdown("### ROC curves & information-theoretic depth")
+        st.caption(
+            "Per-defense ROC + AUC, mutual information of attack metadata with success, "
+            "entropy of per-model vulnerability profiles. Module 4."
+        )
+
+        _roc = _load_json(_find_artifact("report/roc_analysis.json", "roc_analysis.json"))
+        if _roc:
+            st.markdown("**ROC AUC per defense**")
+            roc_rows = []
+            for defense, payload in _roc.items():
+                if isinstance(payload, dict):
+                    roc_rows.append({
+                        "defense": defense,
+                        "auc": payload.get("auc"),
+                        "n_attacks": payload.get("n_attacks"),
+                        "n_detected": payload.get("n_detected"),
+                    })
+            if roc_rows:
+                st.dataframe(pd.DataFrame(roc_rows), width="stretch", hide_index=True)
+
+        _mi = _load_json(_find_artifact("report/mutual_information.json", "mutual_information.json"))
+        if _mi and isinstance(_mi, dict):
+            st.markdown("**Mutual information I(feature → success)**")
+            mi_rows = []
+            for feature, payload in _mi.items():
+                if isinstance(payload, dict):
+                    mi_rows.append({
+                        "feature": feature,
+                        "mutual_information": payload.get("mutual_information") or payload.get("mi") or payload.get("I"),
+                        "normalized_mi": payload.get("normalized_mi") or payload.get("nmi"),
+                        "entropy_feature": payload.get("entropy_feature"),
+                    })
+            if mi_rows:
+                mi_df = pd.DataFrame(mi_rows).sort_values("mutual_information", ascending=False)
+                st.dataframe(mi_df, width="stretch", hide_index=True)
+
+        _entropy = _load_json(_find_artifact("report/entropy_profiles.json", "entropy_profiles.json"))
+        if _entropy and isinstance(_entropy, dict):
+            st.markdown("**Per-model vulnerability-profile entropy** (lower = concentrated vulnerability)")
+            ent_rows = []
+            for model, payload in _entropy.items():
+                if isinstance(payload, dict):
+                    ent_rows.append({
+                        "model": model,
+                        "entropy": payload.get("entropy") or payload.get("H"),
+                        "max_entropy": payload.get("max_entropy"),
+                        "normalized_entropy": payload.get("normalized_entropy") or payload.get("nH"),
+                        "interpretation": payload.get("interpretation"),
+                    })
+            if ent_rows:
+                st.dataframe(pd.DataFrame(ent_rows), width="stretch", hide_index=True)
+
+        if not (_roc or _mi or _entropy):
+            _missing("ROC / MI / entropy", "roc_analysis.json / mutual_information.json / entropy_profiles.json")
+
+        # -------- Raw artifact list (for completeness) --------
+        with st.expander("All artifacts for this job (download links)"):
+            if _artifacts_payload.get("artifacts"):
+                df = pd.DataFrame(_artifacts_payload["artifacts"])
+                st.dataframe(df, width="stretch", hide_index=True)
+            else:
+                st.info("No artifacts found.")
+
 
 with catalog_tab:
     st.subheader("Model Garden / Provider Catalog")
