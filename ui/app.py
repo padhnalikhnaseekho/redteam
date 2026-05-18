@@ -2367,32 +2367,51 @@ with explainability_tab:
 
         _shap_analysis = _load_json(_find_artifact("report/shap_analysis.json", "shap_analysis.json"))
         if _shap_analysis:
-            col1, col2 = st.columns(2)
-            cv_auc = _shap_analysis.get("cv_auc")
-            n_rows = _shap_analysis.get("n_rows") or _shap_analysis.get("n_samples")
+            col1, col2, col3 = st.columns(3)
+            cv_auc = _shap_analysis.get("cv_auc_mean")
+            cv_std = _shap_analysis.get("cv_auc_std")
+            n_rows = _shap_analysis.get("n_samples") or _shap_analysis.get("n_rows")
             with col1:
                 if cv_auc is not None:
-                    st.metric("Attack-success predictor CV AUC", f"{cv_auc:.3f}")
+                    delta = f"±{cv_std:.3f}" if cv_std is not None else None
+                    st.metric("Predictor CV AUC", f"{cv_auc:.3f}", delta=delta, delta_color="off")
             with col2:
+                base_rate = _shap_analysis.get("base_rate")
+                if base_rate is not None:
+                    st.metric("Base attack-success rate", f"{base_rate * 100:.1f}%")
+            with col3:
                 if n_rows is not None:
-                    st.metric("Training rows", f"{n_rows:,}")
-            top_features = _shap_analysis.get("top_features") or _shap_analysis.get("feature_importance")
-            if top_features:
+                    st.metric("Training rows", f"{int(n_rows):,}")
+            shap_imp = _shap_analysis.get("shap_feature_importance") or _shap_analysis.get("top_features")
+            if isinstance(shap_imp, dict) and shap_imp:
                 st.markdown("**Top features by mean(|SHAP|)**")
-                if isinstance(top_features, dict):
-                    feat_df = pd.DataFrame(list(top_features.items()), columns=["feature", "mean_abs_shap"])
-                else:
-                    feat_df = pd.DataFrame(top_features)
-                st.dataframe(feat_df, width="stretch", hide_index=True)
+                items = [(k, float(v)) for k, v in shap_imp.items()]
+                items.sort(key=lambda kv: kv[1], reverse=True)
+                feat_df = pd.DataFrame(items, columns=["feature", "mean_abs_shap"])
+                st.dataframe(feat_df.head(15), width="stretch", hide_index=True)
 
         _defense_shap = _load_json(_find_artifact("report/defense_shap_effects.json", "defense_shap_effects.json"))
         if _defense_shap:
-            st.markdown("**Defense-level SHAP effect on attack success** (negative = defense reduces ASR)")
-            if isinstance(_defense_shap, dict):
-                ds_df = pd.DataFrame(list(_defense_shap.items()), columns=["defense", "mean_signed_shap"])
-            else:
-                ds_df = pd.DataFrame(_defense_shap)
-            st.dataframe(ds_df, width="stretch", hide_index=True)
+            shap_effects = _defense_shap.get("defense_shap_effects") if isinstance(_defense_shap, dict) else None
+            if shap_effects is None and isinstance(_defense_shap, dict) and all(isinstance(v, (int, float, str)) for v in _defense_shap.values()):
+                # Legacy flat-dict shape.
+                shap_effects = _defense_shap
+            if isinstance(shap_effects, dict) and shap_effects:
+                st.markdown("**Defense-level SHAP effect on attack success** (negative = defense reduces ASR)")
+                items = [(k, float(v)) for k, v in shap_effects.items()]
+                items.sort(key=lambda kv: kv[1])  # most-negative first (best defenses)
+                ds_df = pd.DataFrame(items, columns=["defense", "mean_signed_shap"])
+                st.dataframe(ds_df, width="stretch", hide_index=True)
+            cat_shap = _defense_shap.get("category_vulnerability_shap") if isinstance(_defense_shap, dict) else None
+            if isinstance(cat_shap, dict) and cat_shap:
+                st.markdown("**Per-category vulnerability SHAP** (positive = category drives success)")
+                cat_items = [(k, float(v)) for k, v in cat_shap.items()]
+                cat_items.sort(key=lambda kv: kv[1], reverse=True)
+                st.dataframe(pd.DataFrame(cat_items, columns=["attack_category", "mean_signed_shap"]),
+                             width="stretch", hide_index=True)
+            interp = _defense_shap.get("interpretation") if isinstance(_defense_shap, dict) else None
+            if isinstance(interp, str):
+                st.caption(interp)
 
         _shapley = _load_json(_find_artifact("report/shapley_values.json", "shapley_values.json"))
         if _shapley:
@@ -2424,34 +2443,36 @@ with explainability_tab:
                 st.dataframe(pd.DataFrame(roc_rows), width="stretch", hide_index=True)
 
         _mi = _load_json(_find_artifact("report/mutual_information.json", "mutual_information.json"))
-        if _mi:
+        if _mi and isinstance(_mi, dict):
             st.markdown("**Mutual information I(feature → success)**")
-            if isinstance(_mi, dict):
-                mi_rows = []
-                for feature, payload in _mi.items():
-                    if isinstance(payload, dict):
-                        mi_rows.append({
-                            "feature": feature,
-                            "mi": payload.get("mi") or payload.get("I"),
-                            "nmi": payload.get("nmi") or payload.get("normalized_mi"),
-                        })
-                if mi_rows:
-                    st.dataframe(pd.DataFrame(mi_rows), width="stretch", hide_index=True)
+            mi_rows = []
+            for feature, payload in _mi.items():
+                if isinstance(payload, dict):
+                    mi_rows.append({
+                        "feature": feature,
+                        "mutual_information": payload.get("mutual_information") or payload.get("mi") or payload.get("I"),
+                        "normalized_mi": payload.get("normalized_mi") or payload.get("nmi"),
+                        "entropy_feature": payload.get("entropy_feature"),
+                    })
+            if mi_rows:
+                mi_df = pd.DataFrame(mi_rows).sort_values("mutual_information", ascending=False)
+                st.dataframe(mi_df, width="stretch", hide_index=True)
 
         _entropy = _load_json(_find_artifact("report/entropy_profiles.json", "entropy_profiles.json"))
-        if _entropy:
+        if _entropy and isinstance(_entropy, dict):
             st.markdown("**Per-model vulnerability-profile entropy** (lower = concentrated vulnerability)")
-            if isinstance(_entropy, dict):
-                ent_rows = []
-                for model, payload in _entropy.items():
-                    if isinstance(payload, dict):
-                        ent_rows.append({
-                            "model": model,
-                            "entropy": payload.get("entropy") or payload.get("H"),
-                            "normalized_entropy": payload.get("normalized_entropy") or payload.get("nH"),
-                        })
-                if ent_rows:
-                    st.dataframe(pd.DataFrame(ent_rows), width="stretch", hide_index=True)
+            ent_rows = []
+            for model, payload in _entropy.items():
+                if isinstance(payload, dict):
+                    ent_rows.append({
+                        "model": model,
+                        "entropy": payload.get("entropy") or payload.get("H"),
+                        "max_entropy": payload.get("max_entropy"),
+                        "normalized_entropy": payload.get("normalized_entropy") or payload.get("nH"),
+                        "interpretation": payload.get("interpretation"),
+                    })
+            if ent_rows:
+                st.dataframe(pd.DataFrame(ent_rows), width="stretch", hide_index=True)
 
         if not (_roc or _mi or _entropy):
             _missing("ROC / MI / entropy", "roc_analysis.json / mutual_information.json / entropy_profiles.json")
