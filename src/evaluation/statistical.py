@@ -34,8 +34,18 @@ def chi_squared_test(
     b_fail = len(df_b) - b_success
 
     contingency = np.array([[a_success, a_fail], [b_success, b_fail]])
-    chi2, p_value, dof, _ = stats.chi2_contingency(contingency)
-
+    # scipy raises if any row or column sum is zero (degenerate contingency).
+    # This happens whenever one defense reaches 0% or 100% ASR — common with
+    # ML defenses that fully block a category. Fall back to Fisher's exact,
+    # which is exact for 2x2 and tolerates zeros. Degrades to dof=1 always.
+    if contingency.min() == 0 and (contingency.sum(axis=0).min() == 0 or contingency.sum(axis=1).min() == 0):
+        return {"chi2": 0.0, "p_value": 1.0, "dof": 1, "note": "degenerate contingency (zero margin)"}
+    try:
+        chi2, p_value, dof, _ = stats.chi2_contingency(contingency)
+    except ValueError:
+        # Fisher's exact handles small-count tables without zero-expectation errors.
+        odds_ratio, p_value = stats.fisher_exact(contingency)
+        return {"chi2": 0.0, "p_value": float(p_value), "dof": 1, "odds_ratio": float(odds_ratio), "note": "fisher_exact"}
     return {"chi2": float(chi2), "p_value": float(p_value), "dof": int(dof)}
 
 
