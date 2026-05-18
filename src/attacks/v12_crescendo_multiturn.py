@@ -304,8 +304,8 @@ class CrescendoConfig:
         target_model_hint: Optional family hint passed to the strategist.
         cache_path: JSON cache of best (goal_key, target_model) → trajectory.
     """
-    strategist_model: str = "groq-llama"
-    judge_model: str = "groq-llama"
+    strategist_model: str = "vertex-gemini-flash"
+    judge_model: str = "vertex-gemini-flash"
     max_turns: int = 6
     success_threshold: int = 8
     target_model_hint: str = ""
@@ -378,15 +378,25 @@ class CrescendoRunner:
 
     @staticmethod
     def _maybe_load_llm():
-        """Return an LLMClient instance or None if APIs unavailable."""
+        """Return an LLMClient instance or None if no provider creds are available.
+
+        Accepts either Groq (env: GROQ_API_KEY) or Vertex AI (Application
+        Default Credentials). See v9_pair_iterative._maybe_load_llm for the
+        same dual-provider pattern.
+        """
         try:
-            # Same lazy-import pattern as v9 PAIR — keeps the module
-            # importable in offline CI even when Groq SDK is missing.
             from src.utils.llm import LLMClient
-            if not os.environ.get("GROQ_API_KEY"):
-                logger.info("Crescendo: GROQ_API_KEY not set, using offline fallback")
+            if os.environ.get("GROQ_API_KEY"):
+                return LLMClient()
+            try:
+                import google.auth  # type: ignore[import-not-found]
+                google.auth.default()
+                return LLMClient()
+            except Exception:
+                logger.info(
+                    "Crescendo: no Groq key and Vertex ADC unavailable — offline fallback"
+                )
                 return None
-            return LLMClient()
         except Exception as exc:
             logger.info("Crescendo: LLMClient unavailable (%s) — offline fallback", exc)
             return None

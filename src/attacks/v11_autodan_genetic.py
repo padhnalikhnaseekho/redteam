@@ -132,8 +132,8 @@ class AutoDANConfig:
     mutation_rate: float = 1.0
     elitism: int = 2
     top_k: int = 5
-    attacker_model: str = "groq-llama"
-    judge_model: str = "groq-llama"
+    attacker_model: str = "vertex-gemini-flash"
+    judge_model: str = "vertex-gemini-flash"
     target_model_hint: str = ""
     cache_path: Path = field(default_factory=lambda: _CACHE_DEFAULT)
 
@@ -205,16 +205,25 @@ class AutoDANRunner:
 
     @staticmethod
     def _maybe_load_llm():
-        """Return an LLMClient instance or None if APIs unavailable."""
+        """Return an LLMClient instance or None if no provider creds are available.
+
+        Accepts either Groq (env: GROQ_API_KEY) or Vertex AI (Application
+        Default Credentials). See v9_pair_iterative._maybe_load_llm for the
+        same dual-provider pattern.
+        """
         try:
-            # Lazy import: keeps the v11 module importable when the
-            # LLM-provider SDKs are not installed (offline CI). Mirrors
-            # v9_pair_iterative._maybe_load_llm.
             from src.utils.llm import LLMClient
-            if not os.environ.get("GROQ_API_KEY"):
-                logger.info("AutoDAN: GROQ_API_KEY not set, using offline fallback")
+            if os.environ.get("GROQ_API_KEY"):
+                return LLMClient()
+            try:
+                import google.auth  # type: ignore[import-not-found]
+                google.auth.default()
+                return LLMClient()
+            except Exception:
+                logger.info(
+                    "AutoDAN: no Groq key and Vertex ADC unavailable — offline fallback"
+                )
                 return None
-            return LLMClient()
         except Exception as exc:
             logger.info("AutoDAN: LLMClient unavailable (%s) — offline fallback", exc)
             return None
