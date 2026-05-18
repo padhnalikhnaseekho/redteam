@@ -1,0 +1,8 @@
+{
+  "perplexity_filter": 0.178667,
+  "semantic_input_filter": 0.178667,
+  "guardrails": 0.153333,
+  "human_in_loop": 0.153333,
+  "input_filter": 0.153333,
+  "output_validator": 0.153333
+}

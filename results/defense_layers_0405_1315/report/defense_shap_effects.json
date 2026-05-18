@@ -1,0 +1,17 @@
+{
+  "defense_shap_effects": {
+    "input_filter+output_validator+guardrails+human_in_loop+semantic_input_filter+perplexity_filter": "-0.06820288",
+    "none": "-0.062990434",
+    "semantic_input_filter+perplexity_filter": "0.0"
+  },
+  "category_vulnerability_shap": {
+    "v4_context_poisoning": "-0.0021664978",
+    "v3_tool_manipulation": "-0.0069690277",
+    "v7_multi_step_compounding": "-0.0074847825",
+    "v5_reasoning_hijacking": "-0.013348161",
+    "v6_confidence_manipulation": "-0.013936059",
+    "v1_direct_injection": "-0.025443694",
+    "v2_indirect_injection": "-0.08555456"
+  },
+  "interpretation": "Negative SHAP = defense reduces attack success (good). Positive SHAP = category increases attack success (vulnerable)."
+}
