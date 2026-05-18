@@ -1,0 +1,238 @@
+nohup: ignoring input
+
+============================================================
+  CommodityRedTeam Full Benchmark
+============================================================
+  Timestamp:    0518_1705
+  Results dir:  
+/home/anrd/git/epgd/capstone/redteam-local-bench/results/results_0518_1705
+  Models:       groq-qwen, groq-scout, groq-llama
+  Defenses:     input_filter, output_validator, guardrails, human_in_loop, 
+multi_agent
+  Attacks:      74
+  Total runs:   21
+  Skip D4:      False
+============================================================
+
+
+============================================================
+  Model: groq-qwen
+============================================================
+
+[1/21] groq-qwen | no_defense
+PAIR iter 0: attacker call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+PAIR iter 0: attacker call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+PAIR iter 0: attacker call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+PAIR iter 0: attacker call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: mutator call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
+AutoDAN: judge call failed: Vertex model config requires a GCP project. Set GOOGLE_CLOUD_PROJECT or add 'project_id' to the model config.
