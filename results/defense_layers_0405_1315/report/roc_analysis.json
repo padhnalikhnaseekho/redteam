@@ -1,0 +1,18 @@
+{
+  "input_filter+output_validator+guardrails+human_in_loop+semantic_input_filter+perplexity_filter": {
+    "tpr": 10.5,
+    "fpr": 0.9130434782608695,
+    "auc": 5.2935,
+    "n_attacks": 50,
+    "n_detected": 42,
+    "note": "Single operating point (no confidence scores)"
+  },
+  "semantic_input_filter+perplexity_filter": {
+    "tpr": 2.1666666666666665,
+    "fpr": 0.6842105263157895,
+    "auc": 1.2412,
+    "n_attacks": 50,
+    "n_detected": 26,
+    "note": "Single operating point (no confidence scores)"
+  }
+}

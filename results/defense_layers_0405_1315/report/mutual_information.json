@@ -1,0 +1,102 @@
+{
+  "category": {
+    "mutual_information": 0.080499,
+    "normalized_mi": 0.104252,
+    "entropy_feature": 2.773857,
+    "entropy_target": 0.772155,
+    "conditional_entropy_target_given_feature": 0.691656,
+    "information_gain_pct": 10.43,
+    "per_value": {
+      "v1_direct_injection": {
+        "count": 24,
+        "success_rate": 0.375
+      },
+      "v2_indirect_injection": {
+        "count": 30,
+        "success_rate": 0.0667
+      },
+      "v3_tool_manipulation": {
+        "count": 21,
+        "success_rate": 0.1429
+      },
+      "v4_context_poisoning": {
+        "count": 15,
+        "success_rate": 0.1333
+      },
+      "v5_reasoning_hijacking": {
+        "count": 24,
+        "success_rate": 0.375
+      },
+      "v6_confidence_manipulation": {
+        "count": 18,
+        "success_rate": 0.3889
+      },
+      "v7_multi_step_compounding": {
+        "count": 18,
+        "success_rate": 0.1111
+      }
+    }
+  },
+  "severity": {
+    "mutual_information": 0.065225,
+    "normalized_mi": 0.084471,
+    "entropy_feature": 1.756624,
+    "entropy_target": 0.772155,
+    "conditional_entropy_target_given_feature": 0.70693,
+    "information_gain_pct": 8.45,
+    "per_value": {
+      "critical": {
+        "count": 42,
+        "success_rate": 0.119
+      },
+      "high": {
+        "count": 54,
+        "success_rate": 0.2593
+      },
+      "medium": {
+        "count": 48,
+        "success_rate": 0.2083
+      },
+      "low": {
+        "count": 6,
+        "success_rate": 0.8333
+      }
+    }
+  },
+  "model": {
+    "mutual_information": 0.0,
+    "normalized_mi": 0.0,
+    "entropy_feature": -0.0,
+    "entropy_target": 0.772155,
+    "conditional_entropy_target_given_feature": 0.772155,
+    "information_gain_pct": 0.0,
+    "per_value": {
+      "groq-qwen": {
+        "count": 150,
+        "success_rate": 0.2267
+      }
+    }
+  },
+  "defense": {
+    "mutual_information": 0.058854,
+    "normalized_mi": 0.076221,
+    "entropy_feature": 1.584963,
+    "entropy_target": 0.772155,
+    "conditional_entropy_target_given_feature": 0.713301,
+    "information_gain_pct": 7.62,
+    "per_value": {
+      "input_filter+output_validator+guardrails+human_in_loop+semantic_input_filter+perplexity_filter": {
+        "count": 50,
+        "success_rate": 0.08
+      },
+      "none": {
+        "count": 50,
+        "success_rate": 0.36
+      },
+      "semantic_input_filter+perplexity_filter": {
+        "count": 50,
+        "success_rate": 0.24
+      }
+    }
+  }
+}
